@@ -1,0 +1,92 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Design Tokens */
+:root {
+  /* Surfaces */
+  --color-page: #F3F7FC;
+  --color-surface: #FFFFFF;
+  --color-surface-subtle: #F8FAFD;
+  --color-surface-selected: #E8F2FF;
+
+  /* Text */
+  --color-text-primary: #14264A;
+  --color-text-secondary: #64748B;
+  --color-text-muted: #8A9AB0;
+  --color-text-inverse: #FFFFFF;
+
+  /* Brand and interaction */
+  --color-primary: #3988F5;
+  --color-primary-hover: #2675E5;
+  --color-primary-soft: #E7F1FF;
+  --color-border-focus: #78AEFF;
+
+  /* Borders and shadows */
+  --color-border: #E6EDF5;
+  --color-border-strong: #D7E2EF;
+  --shadow-card: 0 2px 10px rgba(35, 72, 120, 0.05);
+  --shadow-popover: 0 8px 28px rgba(35, 72, 120, 0.12);
+
+  /* Semantic colors */
+  --color-success: #1DAA79;
+  --color-success-soft: #E4F8EF;
+  --color-warning: #D99A19;
+  --color-warning-soft: #FFF4D8;
+  --color-danger: #E64F67;
+  --color-danger-soft: #FFE9ED;
+  --color-info: #3988F5;
+  --color-info-soft: #E7F1FF;
+
+  /* Category accents */
+  --color-category-blue: #4E91F7;
+  --color-category-green: #35C49A;
+  --color-category-yellow: #F2C64B;
+  --color-category-red: #EF7180;
+  --color-category-purple: #A985F5;
+
+  /* Typography */
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.dark {
+  --color-page: #0B1120;
+  --color-surface: #1E293B;
+  --color-surface-subtle: #162032;
+  --color-surface-selected: #1E3A8A;
+  --color-text-primary: #F8FAFC;
+  --color-text-secondary: #94A3B8;
+  --color-text-muted: #64748B;
+  --color-border: #334155;
+  --color-border-strong: #475569;
+}
+
+[x-cloak] {
+  display: none !important;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-page);
+  color: var(--color-text-primary);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Custom sleek scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 999px;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #334155;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
