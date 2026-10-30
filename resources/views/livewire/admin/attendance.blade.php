@@ -13,20 +13,36 @@
   </h3>
   <div class="mb-1 text-sm dark:text-white">Filter:</div>
   <div class="mb-4 grid grid-cols-2 flex-wrap items-center gap-5 md:gap-8 lg:flex">
-    <div class="flex flex-col gap-3 lg:flex-row lg:items-center">
-      <x-label for="month_filter" value="Per Bulan"></x-label>
-      <x-input type="month" name="month_filter" id="month_filter" wire:model.live="month" />
+    <div class="col-span-2 inline-flex rounded-xl border border-[#E6EDF5] bg-white p-1 dark:border-gray-700 dark:bg-gray-800">
+      @foreach (['day' => 'Harian', 'week' => 'Mingguan', 'month' => 'Bulanan'] as $value => $label)
+        <button type="button" wire:click="setMode('{{ $value }}')"
+          class="rounded-lg px-4 py-1.5 text-xs font-semibold transition {{ $mode === $value ? 'bg-primary text-white' : 'text-[#64748B] hover:bg-[#F3F7FC] dark:text-gray-400 dark:hover:bg-gray-700' }}">
+          {{ $label }}
+        </button>
+      @endforeach
     </div>
     <div class="flex flex-col gap-3 lg:flex-row lg:items-center">
-      <x-label for="week_filter" value="Per Minggu"></x-label>
-      <x-input type="week" name="week_filter" id="week_filter" wire:model.live="week" />
+      @if ($mode === 'day')
+        <x-label for="day_filter" value="Tanggal"></x-label>
+        <x-input type="date" name="day_filter" id="day_filter" wire:model.live="date" />
+      @elseif ($mode === 'week')
+        <x-label for="week_filter" value="Minggu"></x-label>
+        <x-input type="week" name="week_filter" id="week_filter" wire:model.live="week" />
+      @else
+        <x-label for="month_filter" value="Bulan"></x-label>
+        <x-input type="month" name="month_filter" id="month_filter" wire:model.live="month" />
+      @endif
     </div>
-    <div class="col-span-2 flex flex-col gap-3 lg:flex-row lg:items-center">
-      <x-label for="day_filter" value="Per Hari"></x-label>
-      <x-input type="date" name="day_filter" id="day_filter" wire:model.live="date" />
-    </div>
+    <x-select id="branch" wire:model.live="branch">
+      <option value="">Semua Cabang</option>
+      @foreach (App\Models\Branch::orderBy('name')->get() as $_branch)
+        <option value="{{ $_branch->id }}" {{ $_branch->id == $branch ? 'selected' : '' }}>
+          {{ $_branch->name }}
+        </option>
+      @endforeach
+    </x-select>
     <x-select id="division" wire:model.live="division">
-      <option value="">{{ __('Select Division') }}</option>
+      <option value="">Semua Divisi</option>
       @foreach (App\Models\Division::all() as $_division)
         <option value="{{ $_division->id }}" {{ $_division->id == $division ? 'selected' : '' }}>
           {{ $_division->name }}
@@ -34,7 +50,7 @@
       @endforeach
     </x-select>
     <x-select id="jobTitle" wire:model.live="jobTitle">
-      <option value="">{{ __('Select Job Title') }}</option>
+      <option value="">Semua Jabatan</option>
       @foreach (App\Models\JobTitle::all() as $_jobTitle)
         <option value="{{ $_jobTitle->id }}" {{ $_jobTitle->id == $jobTitle ? 'selected' : '' }}>
           {{ $_jobTitle->name }}
@@ -42,9 +58,8 @@
       @endforeach
     </x-select>
     <div class="col-span-2 flex items-center gap-2 lg:w-96">
-      <x-input type="text" class="w-full" name="search" id="seacrh" wire:model="search"
-        placeholder="{{ __('Search') }}" />
-      <x-button type="button" wire:click="$refresh" wire:loading.attr="disabled">{{ __('Search') }}</x-button>
+      <x-input type="text" class="w-full" name="search" id="search" wire:model.live.debounce.400ms="search"
+        placeholder="{{ __('Search') }}" aria-label="Cari karyawan" />
       @if ($search)
         <x-secondary-button type="button" wire:click="$set('search', '')" wire:loading.attr="disabled">
           {{ __('Reset') }}
@@ -53,17 +68,25 @@
     </div>
     <div class="lg:hidden"></div>
     <x-secondary-button
-      href="{{ route('admin.attendances.report', ['month' => $month, 'week' => $week, 'date' => $date, 'division' => $division, 'jobTitle' => $jobTitle]) }}"
+      href="{{ route('admin.attendances.report', ['month' => $month, 'week' => $week, 'date' => $date, 'division' => $division, 'jobTitle' => $jobTitle, 'branch' => $branch]) }}"
       class="flex justify-center gap-2">
       Cetak Laporan
       <x-heroicon-o-printer class="h-5 w-5" />
     </x-secondary-button>
   </div>
-  <div class="overflow-x-scroll">
+  <div class="mb-2 flex flex-wrap items-center gap-2 text-[11px] font-semibold">
+    <span class="rounded-full bg-green-100 px-2.5 py-1 text-green-800 dark:bg-green-900/40 dark:text-green-300">H Hadir</span>
+    <span class="rounded-full bg-amber-100 px-2.5 py-1 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">T Terlambat</span>
+    <span class="rounded-full bg-blue-100 px-2.5 py-1 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300">I Izin</span>
+    <span class="rounded-full bg-gray-100 px-2.5 py-1 text-gray-700 dark:bg-gray-700 dark:text-gray-300">S Sakit</span>
+    <span class="rounded-full bg-orange-100 px-2.5 py-1 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300">TT Tidak Tuntas</span>
+    <span class="rounded-full bg-red-100 px-2.5 py-1 text-red-800 dark:bg-red-900/40 dark:text-red-300">A Alpa</span>
+  </div>
+  <div class="max-h-[70vh] overflow-auto rounded-xl border border-[#E6EDF5] dark:border-gray-800">
     <table class="w-full divide-y divide-gray-200 dark:divide-gray-700">
-      <thead class="bg-gray-50 dark:bg-gray-900">
+      <thead class="sticky top-0 z-20 bg-gray-50 dark:bg-gray-900">
         <tr>
-          <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300">
+          <th scope="col" class="sticky left-0 z-30 bg-gray-50 px-4 py-3 text-left text-xs font-medium text-gray-500 dark:bg-gray-900 dark:text-gray-300">
             {{ $showUserDetail ? __('Name') : __('Name') . '/' . __('Date') }}
           </th>
           @if ($showUserDetail)
@@ -155,7 +178,8 @@
                   $timeIn = $attendance ? $attendance['time_in'] : null;
                   $timeOut = $attendance ? $attendance['time_out'] : null;
                 @endphp
-                <td class="{{ $class }} text-nowrap group-hover:bg-gray-100 dark:group-hover:bg-gray-700">
+            <td class="{{ $class }} sticky left-0 z-10 bg-white text-nowrap group-hover:bg-gray-100 dark:bg-gray-800 dark:group-hover:bg-gray-700">
+
                   {{ $attendance['shift'] ?? '-' }}
                 </td>
               @endif
@@ -172,7 +196,7 @@
             @endphp
             @foreach ($dates as $date)
               @php
-                $isWeekend = $date->isWeekend();
+                $isWeekend = $date->isWeekend() || in_array($date->format('Y-m-d'), $holidayDates ?? [], true);
                 $attendance = $attendances->firstWhere(fn($v, $k) => $v['date'] === $date->format('Y-m-d'));
                 $status = ($attendance ?? [
                     'status' => $isWeekend || !$date->isPast() ? '-' : 'absent',
@@ -221,11 +245,13 @@
                         break;
                 }
               @endphp
-              @if (!$isPerDayFilter && $attendance && ($attendance['attachment'] || $attendance['note'] || $attendance['coordinates']))
+              @if (!$isPerDayFilter && $attendance)
                 <td
                   class="{{ $bgColor }} cursor-pointer text-center text-sm font-medium text-gray-900 dark:text-white">
                   <button class="w-full px-1 py-3" wire:click="show({{ $attendance['id'] }})"
-                    onclick="setLocation({{ $attendance['lat'] ?? 0 }}, {{ $attendance['lng'] ?? 0 }})">
+                    @if ($attendance['coordinates'])
+                      onclick="setLocation({{ $attendance['lat'] ?? 0 }}, {{ $attendance['lng'] ?? 0 }})"
+                    @endif>
                     {{ $isPerDayFilter && $status != '-' ? __("status_{$status}") : $shortStatus }}
                   </button>
                 </td>
@@ -265,11 +291,15 @@
               <td
                 class="cursor-pointer text-center text-sm font-medium text-gray-900 group-hover:bg-gray-100 dark:text-white dark:group-hover:bg-gray-700">
                 <div class="flex items-center justify-center gap-3">
-                  @if ($attendance && ($attendance['attachment'] || $attendance['note'] || $attendance['coordinates']))
-                    <x-button type="button" wire:click="show({{ $attendance['id'] }})"
-                      onclick="setLocation({{ $attendance['lat'] ?? 0 }}, {{ $attendance['lng'] ?? 0 }})">
+                  @if ($attendance)
+                    <button type="button"
+                      class="inline-flex items-center justify-center rounded-lg border border-[#E6EDF5] bg-white px-3.5 py-2 text-xs font-semibold text-primary transition hover:bg-[#F3F7FC] dark:border-gray-700 dark:bg-gray-800 dark:text-blue-300 dark:hover:bg-gray-700"
+                      wire:click="show({{ $attendance['id'] }})"
+                      @if ($attendance['coordinates'])
+                        onclick="setLocation({{ $attendance['lat'] ?? 0 }}, {{ $attendance['lng'] ?? 0 }})"
+                      @endif>
                       {{ __('Detail') }}
-                    </x-button>
+                    </button>
                   @else
                     -
                   @endif

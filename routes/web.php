@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\MasterDataController;
 use App\Http\Controllers\Admin\AttendanceController;
 use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\ImportExportController;
+use App\Http\Controllers\AttendanceCorrectionController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\UserAttendanceController;
 use Illuminate\Support\Facades\Auth;
@@ -38,6 +39,11 @@ Route::middleware([
 
         Route::get('/leave-requests', [UserAttendanceController::class, 'leaveHistory'])
             ->name('leave-history');
+
+        Route::get('/attendance-correction', [AttendanceCorrectionController::class, 'index'])
+            ->name('attendance-correction');
+        Route::post('/attendance-correction', [AttendanceCorrectionController::class, 'store'])
+            ->name('store-attendance-correction');
     });
 
     // ADMIN AREA
@@ -77,12 +83,22 @@ Route::middleware([
             ->name('admin.masters.education');
         Route::get('/masterdata/shift', [MasterDataController::class, 'shift'])
             ->name('admin.masters.shift');
+        Route::get('/masterdata/branch', [MasterDataController::class, 'branch'])
+            ->name('admin.masters.branch');
+        Route::get('/masterdata/holiday', [MasterDataController::class, 'holiday'])
+            ->name('admin.masters.holiday');
         Route::get('/masterdata/admin', [MasterDataController::class, 'admin'])
             ->name('admin.masters.admin');
 
         // Presence/Absensi
         Route::get('/attendances', [AttendanceController::class, 'index'])
             ->name('admin.attendances');
+
+        Route::get('/overtime', fn () => view('admin.overtime.index'))
+            ->name('admin.overtime');
+
+        Route::get('/corrections', fn () => view('admin.corrections.index'))
+            ->name('admin.corrections');
 
         // Presence/Absensi
         Route::get('/attendances/report', [AttendanceController::class, 'report'])

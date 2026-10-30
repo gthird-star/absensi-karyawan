@@ -13,6 +13,7 @@ class BarcodeController extends Controller
     protected $rules = [
         'name' => ['required', 'string', 'max:255'],
         'value' => ['required', 'string', 'max:255', 'unique:barcodes'],
+        'branch_id' => ['nullable', 'exists:branches,id'],
         'lat' => ['required', 'numeric'],
         'lng' => ['required', 'numeric'],
         'radius' => ['required', 'numeric'],
@@ -46,6 +47,7 @@ class BarcodeController extends Controller
             Barcode::create([
                 'name' => $request->name,
                 'value' => $request->value,
+                'branch_id' => $request->branch_id ?: null,
                 'latitude' => doubleval($request->lat),
                 'longitude' => doubleval($request->lng),
                 'radius' => $request->radius,
@@ -72,6 +74,7 @@ class BarcodeController extends Controller
             $barcode->update([
                 'name' => $request->name,
                 'value' => $request->value,
+                'branch_id' => $request->branch_id ?: null,
                 'latitude' => doubleval($request->lat),
                 'longitude' => doubleval($request->lng),
                 'radius' => $request->radius,

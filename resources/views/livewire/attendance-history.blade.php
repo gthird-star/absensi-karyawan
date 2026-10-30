@@ -10,7 +10,15 @@
     <x-label for="month_filter" value="Bulan"></x-label>
     <x-input type="month" name="month_filter" id="month_filter" wire:model.live="month" />
   </div>
-  <h5 class="mt-3 text-sm dark:text-gray-200">Klik pada tanggal untuk melihat detail</h5>
+  <h4 class="mt-3 text-sm dark:text-gray-200">Tap tanggal untuk melihat detail absensi.</h4>
+  <div class="mt-2 flex flex-wrap items-center gap-2 text-[11px] font-semibold">
+    <span class="rounded-full bg-green-100 px-2.5 py-1 text-green-800 dark:bg-green-900/40 dark:text-green-300">H Hadir</span>
+    <span class="rounded-full bg-amber-100 px-2.5 py-1 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">T Terlambat</span>
+    <span class="rounded-full bg-blue-100 px-2.5 py-1 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300">I Izin</span>
+    <span class="rounded-full bg-gray-100 px-2.5 py-1 text-gray-700 dark:bg-gray-700 dark:text-gray-300">S Sakit</span>
+    <span class="rounded-full bg-orange-100 px-2.5 py-1 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300">TT Belum Lengkap</span>
+    <span class="rounded-full bg-red-100 px-2.5 py-1 text-red-800 dark:bg-red-900/40 dark:text-red-300">A Alpa</span>
+  </div>
   <div class="mt-4 flex w-full flex-col gap-3 lg:flex-row">
     <div class="grid w-96 grid-cols-7 overflow-x-scroll dark:text-white lg:w-[36rem]">
       @foreach (['M', 'S', 'S', 'R', 'K', 'J', 'S'] as $day)
@@ -85,9 +93,11 @@
                   break;
           }
         @endphp
-        @if ($attendance && ($attendance['attachment'] || $attendance['note'] || $attendance['coordinates']))
+        @if ($attendance)
           <button class="{{ $bgColor }} h-14 w-full py-1 text-center" wire:click="show({{ $attendance['id'] }})"
-            onclick="setLocation({{ $attendance['lat'] ?? 0 }}, {{ $attendance['lng'] ?? 0 }})">
+            @if ($attendance['coordinates'])
+              onclick="setLocation({{ $attendance['lat'] ?? 0 }}, {{ $attendance['lng'] ?? 0 }})"
+            @endif>
             <span
               class="{{ $date->isSunday() ? 'text-red-500' : '' }} {{ $date->isFriday() ? 'text-green-600 dark:text-green-500' : '' }}">
               {{ $date->format('d') }}

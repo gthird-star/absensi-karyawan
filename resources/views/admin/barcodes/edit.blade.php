@@ -10,13 +10,10 @@
     </h2>
   </x-slot>
 
-  <div class="py-12">
-    <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-      <div class="overflow-hidden bg-white shadow-xl dark:bg-gray-800 sm:rounded-lg">
-        <div class="p-6 lg:p-8">
-          <form action="{{ route('admin.barcodes.update', $barcode->id) }}" method="post">
-            @csrf
-            @method('PATCH')
+  <div class="bg-white dark:bg-[#1E293B] shadow-card border border-[#E6EDF5] dark:border-gray-800 rounded-2xl p-6 sm:p-8">
+    <form action="{{ route('admin.barcodes.update', $barcode->id) }}" method="post">
+      @csrf
+      @method('PATCH')
 
             <div class="flex flex-col gap-4 md:flex-row md:items-start md:gap-3">
               <div class="w-full">
@@ -31,6 +28,19 @@
                 <x-label for="value">Value Barcode</x-label>
                 @livewire('admin.barcode-value-input-component', ['value' => $barcode->value])
               </div>
+            </div>
+
+            <div class="mt-4">
+              <x-label for="branch_id">Cabang</x-label>
+              <x-select name="branch_id" id="branch_id" class="mt-1 block w-full">
+                <option value="">Tanpa Cabang</option>
+                @foreach (App\Models\Branch::orderBy('name')->get() as $branch)
+                  <option value="{{ $branch->id }}" @selected((old('branch_id') ?? $barcode->branch_id) == $branch->id)>{{ $branch->name }}</option>
+                @endforeach
+              </x-select>
+              @error('branch_id')
+                <x-input-error for="branch_id" class="mt-2" message="{{ $message }}" />
+              @enderror
             </div>
 
             <div class="mt-4 flex gap-3">

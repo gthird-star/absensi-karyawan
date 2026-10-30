@@ -99,6 +99,17 @@
             @enderror
           </div>
         </div>
+        <div class="mt-4">
+          <x-label for="late_tolerance_minutes">Toleransi Terlambat (menit)</x-label>
+          <x-input id="late_tolerance_minutes" class="mt-1 block w-full" type="number" min="0" max="120"
+            wire:model="form.late_tolerance_minutes" />
+          @error('form.late_tolerance_minutes')
+            <x-input-error for="form.late_tolerance_minutes" class="mt-2" message="{{ $message }}" />
+          @enderror
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            Shift yang jam selesainya lebih awal dari jam mulai dihitung lintas tengah malam.
+          </p>
+        </div>
       </x-slot>
 
       <x-slot name="footer">
@@ -142,6 +153,17 @@
               <x-input-error for="form.end_time" class="mt-2" message="{{ $message }}" />
             @enderror
           </div>
+        </div>
+        <div class="mt-4">
+          <x-label for="late_tolerance_minutes">Toleransi Terlambat (menit)</x-label>
+          <x-input id="late_tolerance_minutes" class="mt-1 block w-full" type="number" min="0" max="120"
+            wire:model="form.late_tolerance_minutes" />
+          @error('form.late_tolerance_minutes')
+            <x-input-error for="form.late_tolerance_minutes" class="mt-2" message="{{ $message }}" />
+          @enderror
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            Shift yang jam selesainya lebih awal dari jam mulai dihitung lintas tengah malam.
+          </p>
         </div>
       </x-slot>
 

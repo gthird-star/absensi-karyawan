@@ -4,6 +4,7 @@ namespace App\Livewire\Admin;
 
 use App\Livewire\Traits\AttendanceDetailTrait;
 use App\Models\Attendance;
+use App\Models\Holiday;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -27,18 +28,43 @@ class AttendanceComponent extends Component
 
     public ?string $division = null;
 
+    public ?string $branch = null;
+
     public ?string $jobTitle = null;
 
     public ?string $search = null;
+
+    public string $mode = 'day';
 
     public function mount()
     {
         $this->date = date('Y-m-d');
     }
 
+    public function setMode(string $mode): void
+    {
+        $this->mode = in_array($mode, ['day', 'week', 'month'], true) ? $mode : 'day';
+
+        if ($this->mode === 'day') {
+            $this->month = null;
+            $this->week = null;
+            $this->date = date('Y-m-d');
+        } elseif ($this->mode === 'week') {
+            $this->month = null;
+            $this->date = null;
+            $this->week = now()->format('o-\WW');
+        } else {
+            $this->week = null;
+            $this->date = null;
+            $this->month = now()->format('Y-m');
+        }
+
+        $this->resetPage();
+    }
+
     public function updating($key): void
     {
-        if ($key === 'search' || $key === 'division' || $key === 'jobTitle') {
+        if ($key === 'search' || $key === 'division' || $key === 'jobTitle' || $key === 'branch') {
             $this->resetPage();
         }
         if ($key === 'month') {
@@ -91,6 +117,7 @@ class AttendanceComponent extends Component
                     ->orWhere('nip', 'like', '%'.$this->search.'%');
             })
             ->when($this->division, fn (Builder $q) => $q->where('division_id', $this->division))
+            ->when($this->branch, fn (Builder $q) => $q->where('branch_id', $this->branch))
             ->when($this->jobTitle, fn (Builder $q) => $q->where('job_title_id', $this->jobTitle))
             ->paginate(20)->through(function (User $user) {
                 if ($this->date) {
@@ -182,7 +209,13 @@ class AttendanceComponent extends Component
                 return $user;
             });
 
-        $data = ['employees' => $employees, 'dates' => $dates];
+        $data = [
+            'employees' => $employees,
+            'dates' => $dates,
+            'holidayDates' => Holiday::pluck('date')
+                ->map(fn ($date) => Carbon::parse($date)->toDateString())
+                ->all(),
+        ];
         session(['attendance_employees_fallback' => $data]);
 
         return view('livewire.admin.attendance', $data);

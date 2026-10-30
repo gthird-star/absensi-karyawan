@@ -33,7 +33,7 @@
               <span class="block text-xs text-gray-500 dark:text-gray-400">{{ $req->user->nip }}</span>
             </td>
             <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">
-              {{ $req->type === 'excused' ? 'Izin' : 'Sakit' }}
+              {{ $req->type_label }}
             </td>
             <td class="px-4 py-3 text-sm text-gray-900 dark:text-white text-nowrap">
               {{ $req->from_date->format('d/m/Y') }}
@@ -125,7 +125,7 @@
           </div>
           <div>
             <x-label value="Tipe" />
-            <p>{{ $detailRequest->type === 'excused' ? 'Izin' : 'Sakit' }}</p>
+            <p>{{ $detailRequest->type_label }}</p>
           </div>
           <div>
             <x-label value="Tanggal" />

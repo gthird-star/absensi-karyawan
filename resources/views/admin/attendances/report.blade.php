@@ -53,6 +53,13 @@
   <div style="display: table; width: 100%; margin-bottom: 20px">
     <div style="display: table-cell;">
       <table>
+        @if ($branch)
+          <tr>
+            <td>Cabang</td>
+            <td>:</td>
+            <td>{{ App\Models\Branch::find($branch)?->name ?? '-' }}</td>
+          </tr>
+        @endif
         @if ($division)
           <tr>
             <td>Divisi</td>

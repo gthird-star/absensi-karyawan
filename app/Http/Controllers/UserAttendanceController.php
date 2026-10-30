@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Attendance;
+use App\Models\Holiday;
+use App\Models\LeaveQuota;
 use App\Models\LeaveRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -15,20 +17,44 @@ class UserAttendanceController extends Controller
         $attendance = Attendance::where('user_id', Auth::user()->id)
             ->where('date', date('Y-m-d'))
             ->first();
-        return view('attendances.apply-leave', ['attendance' => $attendance]);
+        $quota = LeaveQuota::firstOrCreate(
+            ['user_id' => Auth::user()->id, 'year' => now()->year],
+            ['quota_days' => 12]
+        );
+        return view('attendances.apply-leave', [
+            'attendance' => $attendance,
+            'quotaRemaining' => $quota->remaining_days,
+        ]);
     }
 
     public function storeLeaveRequest(Request $request)
     {
         $request->validate([
-            'status' => ['required', 'in:excused,sick'],
+            'status' => ['required', 'in:excused,sick,annual'],
             'note' => ['required', 'string', 'max:255'],
             'from' => ['required', 'date'],
-            'to' => ['nullable', 'date', 'after:from'],
+            'to' => ['nullable', 'date', 'after_or_equal:from'],
             'attachment' => ['nullable', 'file', 'max:3072'],
             'lat' => ['nullable', 'numeric'],
             'lng' => ['nullable', 'numeric'],
         ]);
+
+        $from = Carbon::parse($request->from);
+        $to = $request->to ? Carbon::parse($request->to) : $from->copy();
+        $days = $this->workingDays($from, $to);
+
+        if ($request->status === 'annual') {
+            $quota = LeaveQuota::firstOrCreate(
+                ['user_id' => Auth::user()->id, 'year' => now()->year],
+                ['quota_days' => 12]
+            );
+
+            if ($days > $quota->remaining_days) {
+                return redirect()->back()
+                    ->withInput()
+                    ->withErrors(['status' => "Sisa kuota cuti Anda {$quota->remaining_days} hari, pengajuan {$days} hari."]);
+            }
+        }
 
         try {
             $newAttachment = null;
@@ -58,6 +84,18 @@ class UserAttendanceController extends Controller
                 ->with('flash.banner', $th->getMessage())
                 ->with('flash.bannerStyle', 'danger');
         }
+    }
+
+    private function workingDays(Carbon $from, Carbon $to): int
+    {
+        $holidays = Holiday::whereBetween('date', [$from->toDateString(), $to->toDateString()])
+            ->pluck('date')
+            ->map(fn ($date) => Carbon::parse($date)->toDateString())
+            ->all();
+
+        return $from->range($to)
+            ->filter(fn (Carbon $date) => ! $date->isWeekend() && ! in_array($date->toDateString(), $holidays, true))
+            ->count();
     }
 
     public function history()

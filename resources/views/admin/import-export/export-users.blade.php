@@ -16,7 +16,6 @@
       <th>Job Title</th>
       <th>Created At</th>
       <th>Updated At</th>
-      <th>Password</th>
       <th>ID</th>
     </tr>
   </thead>
@@ -38,7 +37,6 @@
         <td>{{ $user->jobTitle?->name }}</td>
         <td>{{ $user->created_at }}</td>
         <td>{{ $user->updated_at }}</td>
-        <td>{{ $user->raw_password }}</td>
         <td>{{ $user->id }}</td>
       </tr>
     @endforeach

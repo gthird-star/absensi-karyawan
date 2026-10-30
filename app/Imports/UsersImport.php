@@ -47,8 +47,7 @@ class UsersImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnFai
             'education_id' => $education_id,
             'division_id' => $division_id,
             'job_title_id' => $job_title_id,
-            'password' => Hash::make($row['password']),
-            'raw_password' => $row['password'],
+            'password' => Hash::make($row['password'] ?? 'password'),
             'created_at' => $row['created_at'],
             'updated_at' => $row['updated_at'],
         ]);
@@ -68,7 +67,7 @@ class UsersImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnFai
             // 'education' => ['nullable', 'exists:educations,name'],
             // 'division' => ['nullable', 'exists:divisions,name'],
             // 'job_title' => ['nullable', 'exists:job_titles,name'],
-            'password' => ['required', 'string'],
+            'password' => ['nullable', 'string'],
         ];
     }
 

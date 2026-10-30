@@ -1,7 +1,6 @@
 @php
   $date = Carbon\Carbon::now();
   $totalAttendance = $presentCount + $lateCount;
-  $attendanceRate = $employeesCount > 0 ? round(($totalAttendance / $employeesCount) * 100) : 0;
 @endphp
 
 <div class="space-y-6">
@@ -112,22 +111,175 @@
     </div>
   </div>
 
-  <!-- Attendance Rate Progress Bar -->
-  <div class="bg-white dark:bg-[#1E293B] p-5 rounded-2xl shadow-card border border-[#E6EDF5] dark:border-gray-800">
-    <div class="flex justify-between items-center mb-2">
-      <div class="flex items-center gap-2">
-        <span class="text-xs font-bold uppercase tracking-wider text-[#14264A] dark:text-white">Tingkat Kehadiran Hari Ini</span>
-        <span class="text-xs font-bold px-2 py-0.5 rounded-full {{ $attendanceRate >= 80 ? 'bg-emerald-50 text-emerald-600' : ($attendanceRate >= 50 ? 'bg-amber-50 text-amber-600' : 'bg-rose-50 text-rose-600') }}">
-          {{ $attendanceRate }}%
-        </span>
+  <!-- KPI Owner -->
+  <div>
+    <div class="mb-3 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+      <div>
+        <h3 class="text-base font-bold text-[#14264A] dark:text-white">KPI Operasional</h3>
+        <p class="text-xs text-[#64748B] dark:text-gray-400">Ringkasan {{ $period }} hari terakhir.</p>
       </div>
-      <span class="text-xs text-[#64748B] dark:text-gray-400">
-        {{ $totalAttendance }} dari {{ $employeesCount }} karyawan hadir
-      </span>
+      <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+        <x-select id="dashboard_branch" wire:model.live="branch" aria-label="Filter cabang">
+          <option value="">Semua Cabang</option>
+          @foreach (App\Models\Branch::orderBy('name')->get() as $branchOption)
+            <option value="{{ $branchOption->id }}">{{ $branchOption->name }}</option>
+          @endforeach
+        </x-select>
+        <div class="inline-flex rounded-xl border border-[#E6EDF5] bg-white p-1 dark:border-gray-700 dark:bg-gray-800">
+          @foreach ([7 => '7 Hari', 30 => '30 Hari', 90 => '90 Hari'] as $days => $label)
+            <button type="button" wire:click="setPeriod({{ $days }})"
+              class="rounded-lg px-3 py-1.5 text-xs font-semibold transition {{ $period === $days ? 'bg-primary text-white' : 'text-[#64748B] hover:bg-[#F3F7FC] dark:text-gray-400 dark:hover:bg-gray-700' }}">
+              {{ $label }}
+            </button>
+          @endforeach
+        </div>
+      </div>
     </div>
-    <div class="w-full bg-gray-100 dark:bg-gray-800 rounded-full h-3 overflow-hidden">
-      <div class="bg-gradient-to-r from-primary to-emerald-500 h-3 rounded-full transition-all duration-500" style="width: {{ min(100, $attendanceRate) }}%"></div>
+
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div class="rounded-2xl border border-[#E6EDF5] bg-white p-5 shadow-card dark:border-gray-800 dark:bg-[#1E293B]">
+        <p class="text-xs font-semibold uppercase tracking-wider text-[#64748B] dark:text-gray-400">Ketepatan Waktu</p>
+        <p class="mt-1 text-3xl font-extrabold text-[#14264A] dark:text-white">{{ $punctuality }}%</p>
+        <p class="mt-1 text-[11px] text-[#8A9AB0] dark:text-gray-400">{{ $periodLate }} keterlambatan dari {{ $periodPresent }} kehadiran</p>
+      </div>
+      <div class="rounded-2xl border border-[#E6EDF5] bg-white p-5 shadow-card dark:border-gray-800 dark:bg-[#1E293B]">
+        <p class="text-xs font-semibold uppercase tracking-wider text-[#64748B] dark:text-gray-400">Total Lembur</p>
+        <p class="mt-1 text-3xl font-extrabold text-emerald-600 dark:text-emerald-400">
+          {{ intdiv($periodOvertime, 60) }}<span class="text-base font-semibold"> jam</span>
+        </p>
+        <p class="mt-1 text-[11px] text-[#8A9AB0] dark:text-gray-400">{{ $periodOvertime % 60 }} menit tambahan</p>
+      </div>
+      <div class="rounded-2xl border border-[#E6EDF5] bg-white p-5 shadow-card dark:border-gray-800 dark:bg-[#1E293B]">
+        <p class="text-xs font-semibold uppercase tracking-wider text-[#64748B] dark:text-gray-400">Pulang Cepat</p>
+        <p class="mt-1 text-3xl font-extrabold text-rose-600 dark:text-rose-400">
+          {{ intdiv($periodEarlyLeave, 60) }}<span class="text-base font-semibold"> jam</span>
+        </p>
+        <p class="mt-1 text-[11px] text-[#8A9AB0] dark:text-gray-400">{{ $periodEarlyLeave % 60 }} menit lebih awal</p>
+      </div>
+      <div class="rounded-2xl border border-[#E6EDF5] bg-white p-5 shadow-card dark:border-gray-800 dark:bg-[#1E293B]">
+        <p class="text-xs font-semibold uppercase tracking-wider text-[#64748B] dark:text-gray-400">Izin Menunggu</p>
+        <p class="mt-1 text-3xl font-extrabold text-amber-600 dark:text-amber-400">{{ $pendingLeaveCount }}</p>
+        <p class="mt-1 text-[11px] text-[#8A9AB0] dark:text-gray-400">Perlu konfirmasi HRD</p>
+      </div>
     </div>
+  </div>
+
+  <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
+    <!-- Trend -->
+    <div class="rounded-2xl border border-[#E6EDF5] bg-white p-5 shadow-card dark:border-gray-800 dark:bg-[#1E293B] lg:col-span-2">
+      <div class="mb-4 flex items-center justify-between">
+        <div>
+          <h4 class="text-sm font-bold text-[#14264A] dark:text-white">Tren Kehadiran</h4>
+          <p class="text-[11px] text-[#8A9AB0] dark:text-gray-400">Hijau: hadir, kuning: terlambat.</p>
+        </div>
+        <span class="text-xs font-semibold text-[#64748B] dark:text-gray-400">{{ $period }} hari</span>
+      </div>
+      <div class="flex h-40 items-end gap-[3px]" role="img"
+        aria-label="Grafik tren kehadiran {{ $period }} hari terakhir">
+        @foreach ($trend as $day)
+          <div class="group relative flex h-full flex-1 flex-col justify-end"
+            title="{{ $day['label'] }} - hadir {{ $day['present'] }}, terlambat {{ $day['late'] }}">
+            <span class="sr-only">{{ $day['label'] }}: hadir {{ $day['present'] }}, terlambat {{ $day['late'] }}</span>
+            <div class="w-full rounded-t bg-emerald-400/80 dark:bg-emerald-500/70"
+              style="height: {{ round(($day['present'] / $maxTrend) * 100) }}%"></div>
+            @if ($day['late'] > 0)
+              <div class="w-full bg-amber-400"
+                style="height: {{ round(($day['late'] / $maxTrend) * 100) }}%"></div>
+            @endif
+          </div>
+        @endforeach
+      </div>
+      <div class="mt-2 flex justify-between text-[10px] text-[#8A9AB0] dark:text-gray-500">
+        <span>{{ $trend->first()['label'] ?? '' }}</span>
+        <span>{{ $trend->last()['label'] ?? '' }}</span>
+      </div>
+    </div>
+
+    <!-- Top Late -->
+    <div class="rounded-2xl border border-[#E6EDF5] bg-white p-5 shadow-card dark:border-gray-800 dark:bg-[#1E293B]">
+      <h4 class="mb-3 text-sm font-bold text-[#14264A] dark:text-white">Paling Sering Terlambat</h4>
+      <div class="space-y-3">
+        @forelse ($topLate as $late)
+          <div class="flex items-center justify-between gap-3">
+            <div class="min-w-0">
+              <p class="truncate text-xs font-semibold text-[#14264A] dark:text-white">{{ $late['name'] }}</p>
+              <p class="truncate text-[11px] text-[#8A9AB0] dark:text-gray-400">{{ $late['division'] }}</p>
+            </div>
+            <span class="shrink-0 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-bold text-amber-700 dark:bg-amber-950/40 dark:text-amber-400">
+              {{ $late['late_count'] }}x
+            </span>
+          </div>
+        @empty
+          <p class="text-xs text-[#8A9AB0] dark:text-gray-400">Tidak ada keterlambatan.</p>
+        @endforelse
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+    <div class="rounded-2xl border border-[#E6EDF5] bg-white p-5 shadow-card dark:border-gray-800 dark:bg-[#1E293B]">
+      <h4 class="mb-3 text-sm font-bold text-[#14264A] dark:text-white">Kehadiran per Divisi</h4>
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-xs">
+        <thead>
+          <tr class="border-b border-[#E6EDF5] text-[11px] font-bold uppercase tracking-wider text-[#64748B] dark:border-gray-800 dark:text-gray-400">
+            <th class="px-0 py-2">Divisi</th>
+            <th class="px-0 py-2 text-center">Karyawan</th>
+            <th class="px-0 py-2 text-center">Kehadiran</th>
+            <th class="px-0 py-2 text-center">Terlambat</th>
+            <th class="px-0 py-2 text-center">Lembur</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-[#E6EDF5] dark:divide-gray-800">
+          @forelse ($divisionStats as $stat)
+            <tr>
+              <td class="py-2 font-semibold text-[#14264A] dark:text-white">{{ $stat['name'] }}</td>
+              <td class="py-2 text-center text-[#64748B] dark:text-gray-400">{{ $stat['employees'] }}</td>
+              <td class="py-2 text-center font-semibold text-emerald-600 dark:text-emerald-400">{{ $stat['present'] }}</td>
+              <td class="py-2 text-center font-semibold text-amber-600 dark:text-amber-400">{{ $stat['late'] }}</td>
+              <td class="py-2 text-center text-[#64748B] dark:text-gray-400">{{ intdiv($stat['overtime_minutes'], 60) }} jam</td>
+            </tr>
+          @empty
+            <tr>
+              <td colspan="5" class="py-4 text-center text-[#8A9AB0] dark:text-gray-400">Belum ada data pada periode ini.</td>
+            </tr>
+          @endforelse
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="rounded-2xl border border-[#E6EDF5] bg-white p-5 shadow-card dark:border-gray-800 dark:bg-[#1E293B]">
+    <h4 class="mb-3 text-sm font-bold text-[#14264A] dark:text-white">Perbandingan Cabang</h4>
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-xs">
+        <thead>
+          <tr class="border-b border-[#E6EDF5] text-[11px] font-bold uppercase tracking-wider text-[#64748B] dark:border-gray-800 dark:text-gray-400">
+            <th class="px-0 py-2">Cabang</th>
+            <th class="px-0 py-2 text-center">Karyawan</th>
+            <th class="px-0 py-2 text-center">Kehadiran</th>
+            <th class="px-0 py-2 text-center">Terlambat</th>
+            <th class="px-0 py-2 text-center">Lembur</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-[#E6EDF5] dark:divide-gray-800">
+          @forelse ($branchStats as $stat)
+            <tr>
+              <td class="py-2 font-semibold text-[#14264A] dark:text-white">{{ $stat['name'] }}</td>
+              <td class="py-2 text-center text-[#64748B] dark:text-gray-400">{{ $stat['employees'] }}</td>
+              <td class="py-2 text-center font-semibold text-emerald-600 dark:text-emerald-400">{{ $stat['present'] }}</td>
+              <td class="py-2 text-center font-semibold text-amber-600 dark:text-amber-400">{{ $stat['late'] }}</td>
+              <td class="py-2 text-center text-[#64748B] dark:text-gray-400">{{ intdiv($stat['overtime_minutes'], 60) }} jam</td>
+            </tr>
+          @empty
+            <tr>
+              <td colspan="5" class="py-4 text-center text-[#8A9AB0] dark:text-gray-400">Belum ada data pada periode ini.</td>
+            </tr>
+          @endforelse
+        </tbody>
+      </table>
+    </div>
+  </div>
   </div>
 
   <!-- Pending Leave Request Alert Banner -->
@@ -148,6 +300,49 @@
     </div>
   @endif
 
+  <!-- Perlu Perhatian -->
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <a href="{{ route('admin.attendances') }}"
+      class="group rounded-2xl border border-{{ $notCheckedOut > 0 ? 'amber-200 bg-amber-50' : '[#E6EDF5] bg-white' }} dark:{{ $notCheckedOut > 0 ? 'border-amber-800/40 bg-amber-950/20' : 'border-gray-800 bg-[#1E293B]' }} p-5 shadow-card transition hover:shadow-card-hover">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-bold uppercase tracking-wider text-[#64748B] dark:text-gray-400">Belum Absen Keluar</span>
+        <x-heroicon-o-arrow-right-on-rectangle class="h-5 w-5 text-[#8A9AB0] dark:text-gray-500 group-hover:text-primary" />
+      </div>
+      <p class="mt-2 text-3xl font-extrabold {{ $notCheckedOut > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-[#14264A] dark:text-white' }}">{{ $notCheckedOut }}</p>
+      <p class="mt-1 text-[11px] text-[#8A9AB0] dark:text-gray-400">{{ $notCheckedOut > 0 ? 'Siap untuk checkout hari ini' : 'Semua sudah absen keluar' }}</p>
+    </a>
+
+    <a href="{{ route('admin.leave-requests') }}"
+      class="group rounded-2xl border border-{{ $pendingLeaveCount > 0 ? 'amber-200 bg-amber-50' : '[#E6EDF5] bg-white' }} dark:{{ $pendingLeaveCount > 0 ? 'border-amber-800/40 bg-amber-950/20' : 'border-gray-800 bg-[#1E293B]' }} p-5 shadow-card transition hover:shadow-card-hover">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-bold uppercase tracking-wider text-[#64748B] dark:text-gray-400">Izin Pending</span>
+        <x-heroicon-o-document-text class="h-5 w-5 text-[#8A9AB0] dark:text-gray-500 group-hover:text-primary" />
+      </div>
+      <p class="mt-2 text-3xl font-extrabold {{ $pendingLeaveCount > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-[#14264A] dark:text-white' }}">{{ $pendingLeaveCount }}</p>
+      <p class="mt-1 text-[11px] text-[#8A9AB0] dark:text-gray-400">{{ $pendingLeaveCount > 0 ? 'Perlu konfirmasi HRD' : 'Tidak ada pengajuan pending' }}</p>
+    </a>
+
+    <a href="{{ route('admin.corrections') }}"
+      class="group rounded-2xl border border-{{ $pendingCorrectionCount > 0 ? 'rose-200 bg-rose-50' : '[#E6EDF5] bg-white' }} dark:{{ $pendingCorrectionCount > 0 ? 'border-rose-800/40 bg-rose-950/20' : 'border-gray-800 bg-[#1E293B]' }} p-5 shadow-card transition hover:shadow-card-hover">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-bold uppercase tracking-wider text-[#64748B] dark:text-gray-400">Koreksi Absen</span>
+        <x-heroicon-o-pencil-square class="h-5 w-5 text-[#8A9AB0] dark:text-gray-500 group-hover:text-primary" />
+      </div>
+      <p class="mt-2 text-3xl font-extrabold {{ $pendingCorrectionCount > 0 ? 'text-rose-600 dark:text-rose-400' : 'text-[#14264A] dark:text-white' }}">{{ $pendingCorrectionCount }}</p>
+      <p class="mt-1 text-[11px] text-[#8A9AB0] dark:text-gray-400">{{ $pendingCorrectionCount > 0 ? 'Pengajuan karyawan menunggu review' : 'Tidak ada koreksi pending' }}</p>
+    </a>
+
+    <a href="{{ route('admin.attendances') }}"
+      class="group rounded-2xl border border-[#E6EDF5] bg-white p-5 shadow-card transition hover:shadow-card-hover dark:border-gray-800 dark:bg-[#1E293B]">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-bold uppercase tracking-wider text-[#64748B] dark:text-gray-400">Koreksi Diterapkan</span>
+        <x-heroicon-o-check-circle class="h-5 w-5 text-[#8A9AB0] dark:text-gray-500 group-hover:text-primary" />
+      </div>
+      <p class="mt-2 text-3xl font-extrabold text-[#14264A] dark:text-white">{{ $correctedToday }}</p>
+      <p class="mt-1 text-[11px] text-[#8A9AB0] dark:text-gray-400">Diterapkan hari ini</p>
+    </a>
+  </div>
+
   <!-- Main Table Section ala Finora -->
   <div class="bg-white dark:bg-[#1E293B] rounded-2xl shadow-card border border-[#E6EDF5] dark:border-gray-800 overflow-hidden">
     <!-- Table Header -->
@@ -159,7 +354,7 @@
             Total {{ $employees->total() }} Data
           </span>
         </div>
-        <p class="text-xs text-[#64748B] dark:text-gray-400 mt-0.5">Monitoring absensi real-time seluruh pegawai Soerabaja45 Group.</p>
+        <p class="text-xs text-[#64748B] dark:text-gray-400 mt-0.5">Monitoring absensi real-time seluruh karyawan Soerabaja45 Group.</p>
       </div>
 
       <div class="flex items-center gap-2">
@@ -190,7 +385,7 @@
               $attendance = $employee->attendance;
               $timeIn = $attendance ? $attendance?->time_in?->format('H:i:s') : null;
               $timeOut = $attendance ? $attendance?->time_out?->format('H:i:s') : null;
-              $isWeekend = $date->isWeekend();
+              $isWeekend = $date->isWeekend() || $isHolidayToday;
               $status = ($attendance ?? [
                   'status' => $isWeekend || !$date->isPast() ? '-' : 'absent',
               ])['status'];

@@ -3,10 +3,12 @@
 namespace App\Livewire\Admin;
 
 use App\Models\Attendance;
+use App\Models\LeaveQuota;
 use App\Models\LeaveRequest;
 use App\Models\User;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Laravel\Jetstream\InteractsWithBanner;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -41,29 +43,44 @@ class LeaveRequestComponent extends Component
     public function executeApprove()
     {
         $leaveRequest = LeaveRequest::with('user')->findOrFail($this->approvingId);
-        $leaveRequest->update([
-            'status' => 'approved',
-            'reviewed_by' => Auth::user()->id,
-            'reviewed_at' => now(),
-        ]);
+        $attendanceStatus = $leaveRequest->type === 'annual' ? 'excused' : $leaveRequest->type;
+        $from = Carbon::parse($leaveRequest->from_date);
+        $to = Carbon::parse($leaveRequest->to_date);
 
-        Carbon::parse($leaveRequest->from_date)
-            ->range(Carbon::parse($leaveRequest->to_date))
-            ->forEach(function (Carbon $date) use ($leaveRequest) {
+        DB::transaction(function () use ($leaveRequest, $attendanceStatus, $from, $to) {
+            $leaveRequest->update([
+                'status' => 'approved',
+                'reviewed_by' => Auth::user()->id,
+                'reviewed_at' => now(),
+            ]);
+
+            $from->range($to)->forEach(function (Carbon $date) use ($leaveRequest, $attendanceStatus) {
                 Attendance::updateOrCreate(
                     [
                         'user_id' => $leaveRequest->user_id,
                         'date' => $date->toDateString(),
                     ],
                     [
-                        'status' => $leaveRequest->type,
-                        'note' => $leaveRequest->note,
+                        'status' => $attendanceStatus,
+                        'note' => $leaveRequest->type === 'annual'
+                            ? 'Cuti tahunan: '.$leaveRequest->note
+                            : $leaveRequest->note,
                         'attachment' => $leaveRequest->attachment,
                         'latitude' => $leaveRequest->latitude,
                         'longitude' => $leaveRequest->longitude,
                     ]
                 );
             });
+
+            if ($leaveRequest->type === 'annual') {
+                $days = $from->range($to)->filter(fn (Carbon $date) => ! $date->isWeekend())->count();
+                $quota = LeaveQuota::firstOrCreate(
+                    ['user_id' => $leaveRequest->user_id, 'year' => $from->year],
+                    ['quota_days' => 12]
+                );
+                $quota->increment('used_days', $days);
+            }
+        });
 
         $this->confirmingApproval = false;
         $this->approvingId = null;

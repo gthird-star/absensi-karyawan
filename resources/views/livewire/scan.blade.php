@@ -41,8 +41,8 @@
     @if (!$isAbsence)
       <div class="flex flex-col gap-4">
         <div>
-          <x-select id="shift" class="mt-1 block w-full" wire:model="shift_id" disabled="{{ !is_null($attendance) }}">
-            <option value="">{{ __('Select Shift') }}</option>
+          <x-select id="shift" class="mt-1 block w-full" wire:model="shift_id" disabled="{{ !is_null($attendance) }}" title="{{ is_null($attendance) ? 'Pilih shift' : 'Shifter terkunci karena sudah absen hari ini' }}">
+            <option value="">Pilih shift</option>
             @foreach ($shifts as $shift)
               <option value="{{ $shift->id }}" {{ $shift->id == $shift_id ? 'selected' : '' }}>
                 {{ $shift->name . ' | ' . $shift->start_time . ' - ' . $shift->end_time }}
@@ -52,16 +52,37 @@
           @error('shift_id')
             <x-input-error for="shift" class="mt-2" message={{ $message }} />
           @enderror
+          @if (!is_null($attendance))
+            <p class="mt-1 text-xs text-amber-600 dark:text-amber-400">
+              Shift terkunci karena sudah absen hari ini.
+            </p>
+          @endif
         </div>
         <div class="flex justify-center outline outline-gray-100 dark:outline-slate-700" wire:ignore>
           <div id="scanner" class="min-h-72 sm:min-h-96 w-72 rounded-sm outline-dashed outline-slate-500 sm:w-96">
           </div>
         </div>
+        <p class="text-center text-sm text-gray-500 dark:text-gray-400">
+          Arahkan kamera ke QR code di lokasi absen.
+        </p>
+        <div class="grid grid-cols-2 gap-2 text-xs">
+          <div class="rounded-xl border border-[#E6EDF5] bg-[#F8FAFD] px-3 py-2 dark:border-gray-700 dark:bg-gray-800">
+            <span class="block font-semibold text-gray-500 dark:text-gray-400">Akurasi GPS</span>
+            <span id="gps-accuracy" class="font-bold text-[#14264A] dark:text-white">Menunggu…</span>
+          </div>
+          <div class="rounded-xl border border-[#E6EDF5] bg-[#F8FAFD] px-3 py-2 dark:border-gray-700 dark:bg-gray-800">
+            <span class="block font-semibold text-gray-500 dark:text-gray-400">Jarak ke QR</span>
+            <span id="qr-distance" class="font-bold text-[#14264A] dark:text-white">Menunggu…</span>
+          </div>
+        </div>
       </div>
     @endif
     <div class="w-full">
-      <h4 id="scanner-error" class="mb-3 text-lg font-semibold text-red-500 dark:text-red-400 sm:text-xl" wire:ignore>
-      </h4>
+      <p id="scanner-error" role="alert" class="mb-3 text-lg font-semibold text-red-500 dark:text-red-400 sm:text-xl" wire:ignore>
+      </p>
+      <p class="mb-3 hidden text-sm font-semibold text-primary dark:text-blue-400" wire:loading wire:target="scan">
+        Memproses absensi…
+      </p>
       <h4 id="scanner-result" class="mb-3 hidden text-lg font-semibold text-green-500 dark:text-green-400 sm:text-xl">
         {{ $successMsg }}
       </h4>
@@ -136,6 +157,16 @@
 
       <div class="my-6 h-52 w-full md:h-64" id="map" wire:ignore></div>
 
+      <div class="mb-4 flex items-center justify-between rounded-2xl border border-[#E6EDF5] bg-[#F8FAFD] px-4 py-3 dark:border-gray-700 dark:bg-gray-800">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Sisa Cuti Tahunan</p>
+          <p class="text-lg font-bold text-[#14264A] dark:text-white">{{ $quotaRemaining ?? 0 }} hari</p>
+        </div>
+        <a href="{{ route('apply-leave') }}" class="text-xs font-semibold text-primary hover:underline dark:text-blue-400">
+          Ajukan cuti
+        </a>
+      </div>
+
       <hr class="my-4">
 
       <div class="grid grid-cols-2 gap-3 md:grid-cols-2 lg:grid-cols-3" wire:ignore>
@@ -163,12 +194,52 @@
       </div>
     </div>
   </div>
+  <div id="scan-toast" aria-live="polite"
+    class="fixed bottom-24 left-1/2 z-50 hidden -translate-x-1/2 rounded-full bg-emerald-600 px-5 py-3 text-sm font-bold text-white shadow-xl lg:bottom-8">
+    Absensi berhasil.
+  </div>
 </div>
 
 @script
   <script>
     const errorMsg = document.querySelector('#scanner-error');
+    const scanBarcodes = @json($scanBarcodes ?? []);
+    const scanToast = document.querySelector('#scan-toast');
+    let currentMarker = null;
     getLocation();
+
+    function distanceMeters(lat1, lng1, lat2, lng2) {
+      const R = 6371000;
+      const toRad = (value) => (value * Math.PI) / 180;
+      const dLat = toRad(lat2 - lat1);
+      const dLng = toRad(lng2 - lng1);
+      const a = Math.sin(dLat / 2) ** 2 +
+        Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+      return Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+    }
+
+    function updateQrDistance(lat, lng) {
+      const distanceEl = document.querySelector('#qr-distance');
+      if (!distanceEl || !scanBarcodes.length) return;
+
+      const nearest = scanBarcodes
+        .map((barcode) => ({
+          distance: distanceMeters(lat, lng, Number(barcode.latitude), Number(barcode.longitude)),
+          radius: Number(barcode.radius),
+        }))
+        .sort((a, b) => a.distance - b.distance)[0];
+
+      distanceEl.textContent = `${nearest.distance} m / ${nearest.radius} m`;
+      distanceEl.classList.toggle('text-emerald-600', nearest.distance <= nearest.radius);
+      distanceEl.classList.toggle('text-rose-600', nearest.distance > nearest.radius);
+    }
+
+    function showToast(message) {
+      if (!scanToast) return;
+      scanToast.textContent = message;
+      scanToast.classList.remove('hidden');
+      setTimeout(() => scanToast.classList.add('hidden'), 4000);
+    }
 
     async function getLocation() {
       if (navigator.geolocation) {
@@ -177,19 +248,29 @@
           maxZoom: 21,
         }).addTo(map);
         navigator.geolocation.watchPosition((position) => {
-          console.log(position);
-          $wire.$set('currentLiveCoords', [position.coords.latitude, position.coords.longitude]);
-          map.setView([
-            Number(position.coords.latitude),
-            Number(position.coords.longitude),
-          ], 13);
-          L.marker([position.coords.latitude, position.coords.longitude]).addTo(map);
+          const lat = Number(position.coords.latitude);
+          const lng = Number(position.coords.longitude);
+          $wire.$set('currentLiveCoords', [lat, lng]);
+
+          const accuracyEl = document.querySelector('#gps-accuracy');
+          if (accuracyEl) {
+            accuracyEl.textContent = `±${Math.round(position.coords.accuracy)} m`;
+          }
+          updateQrDistance(lat, lng);
+
+          if (currentMarker) {
+            currentMarker.setLatLng([lat, lng]);
+            map.setView([lat, lng], Math.max(map.getZoom(), 16));
+          } else {
+            currentMarker = L.marker([lat, lng]).addTo(map);
+            map.setView([lat, lng], 17);
+          }
         }, (err) => {
           console.error(`ERROR(${err.code}): ${err.message}`);
-          alert('{{ __('Please enable your location') }}');
+          errorMsg.innerHTML = 'Lokasi tidak aktif. Izinkan akses lokasi di browser.';
         });
       } else {
-        document.querySelector('#scanner-error').innerHTML = "Gagal mendeteksi lokasi";
+        document.querySelector('#scanner-error').innerHTML = 'Gagal mendeteksi lokasi';
       }
     }
 
@@ -269,9 +350,14 @@
       }
 
       function onAttendanceSuccess() {
-        scanner.stop();
+        try {
+          scanner.stop();
+        } catch (error) {
+          console.error(error);
+        }
         errorMsg.innerHTML = '';
         document.querySelector('#scanner-result').classList.remove('hidden');
+        showToast(document.querySelector('#scanner-result').textContent.trim() || 'Absensi berhasil.');
       }
 
       const observer = new MutationObserver((mutationList, observer) => {
@@ -327,16 +413,18 @@
       });
 
       const map = L.map('map').setView([
-        Number({{ $attendance?->latitude }}),
-        Number({{ $attendance?->longitude }}),
-      ], 13);
+        Number({{ $attendance?->latitude ?? ($scanBarcodes[0]->latitude ?? -6.2) }}),
+        Number({{ $attendance?->longitude ?? ($scanBarcodes[0]->longitude ?? 106.8) }}),
+      ], {{ $attendance?->lat_lng ? 17 : 13 }});
       L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 21,
       }).addTo(map);
-      L.marker([
-        Number({{ $attendance?->latitude }}),
-        Number({{ $attendance?->longitude }}),
-      ]).addTo(map);
+      @if ($attendance?->lat_lng)
+        L.marker([
+          Number({{ $attendance->latitude }}),
+          Number({{ $attendance->longitude }}),
+        ]).addTo(map);
+      @endif
     }
   </script>
 @endscript

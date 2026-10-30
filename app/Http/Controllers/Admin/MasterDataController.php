@@ -26,6 +26,16 @@ class MasterDataController extends Controller
         return view('admin.master-data.shift');
     }
 
+    public function branch()
+    {
+        return view('admin.master-data.branch');
+    }
+
+    public function holiday()
+    {
+        return view('admin.master-data.holiday');
+    }
+
     public function admin()
     {
         return view('admin.master-data.admin');

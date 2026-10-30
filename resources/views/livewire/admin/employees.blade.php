@@ -302,6 +302,30 @@
             @enderror
           </div>
         </div>
+        @if ($form->group === 'user')
+          <div class="mt-4">
+            <x-label for="form.branch_id" value="Cabang" />
+            <x-select id="form.branch_id" class="mt-1 block w-full" wire:model="form.branch_id">
+              <option value="">Tanpa Cabang</option>
+              @foreach (App\Models\Branch::orderBy('name')->get() as $branch)
+                <option value="{{ $branch->id }}" {{ $branch->id == $form->branch_id ? 'selected' : '' }}>
+                  {{ $branch->name }}
+                </option>
+              @endforeach
+            </x-select>
+            @error('form.branch_id')
+              <x-input-error for="form.branch_id" class="mt-2" message="{{ $message }}" />
+            @enderror
+          </div>
+          <div class="mt-4">
+            <x-label for="form.leave_quota_days" value="Kuota Cuti Tahunan (hari)" />
+            <x-input id="form.leave_quota_days" class="mt-1 block w-full" type="number" min="0" max="365"
+              wire:model="form.leave_quota_days" />
+            @error('form.leave_quota_days')
+              <x-input-error for="form.leave_quota_days" class="mt-2" message="{{ $message }}" />
+            @enderror
+          </div>
+        @endif
         <div class="mt-4">
           <x-label for="form.division_id" value="{{ __('Division') }}" />
           <x-select id="form.division_id" class="mt-1 block w-full" wire:model="form.division_id">
@@ -504,6 +528,30 @@
             @enderror
           </div>
         </div>
+        @if ($form->group === 'user')
+          <div class="mt-4">
+            <x-label for="form.branch_id" value="Cabang" />
+            <x-select id="form.branch_id" class="mt-1 block w-full" wire:model="form.branch_id">
+              <option value="">Tanpa Cabang</option>
+              @foreach (App\Models\Branch::orderBy('name')->get() as $branch)
+                <option value="{{ $branch->id }}" {{ $branch->id == $form->branch_id ? 'selected' : '' }}>
+                  {{ $branch->name }}
+                </option>
+              @endforeach
+            </x-select>
+            @error('form.branch_id')
+              <x-input-error for="form.branch_id" class="mt-2" message="{{ $message }}" />
+            @enderror
+          </div>
+          <div class="mt-4">
+            <x-label for="form.leave_quota_days" value="Kuota Cuti Tahunan (hari)" />
+            <x-input id="form.leave_quota_days" class="mt-1 block w-full" type="number" min="0" max="365"
+              wire:model="form.leave_quota_days" />
+            @error('form.leave_quota_days')
+              <x-input-error for="form.leave_quota_days" class="mt-2" message="{{ $message }}" />
+            @enderror
+          </div>
+        @endif
         <div class="mt-4">
           <x-label for="form.division_id" value="{{ __('Division') }}" />
           <x-select id="form.division_id" class="mt-1 block w-full" wire:model="form.division_id">

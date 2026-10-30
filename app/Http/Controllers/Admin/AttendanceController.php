@@ -30,6 +30,7 @@ class AttendanceController extends Controller
             'week' => 'nullable',
             'division' => 'nullable|exists:divisions,id',
             'job_title' => 'nullable|exists:job_titles,id',
+            'branch' => 'nullable|exists:branches,id',
         ]);
 
         if (!$request->date && !$request->month && !$request->week) {
@@ -52,6 +53,7 @@ class AttendanceController extends Controller
         $employees = User::where('group', 'user')
             ->when($request->division, fn (Builder $q) => $q->where('division_id', $request->division))
             ->when($request->jobTitle, fn (Builder $q) => $q->where('job_title_id', $request->jobTitle))
+            ->when($request->branch, fn (Builder $q) => $q->where('branch_id', $request->branch))
             ->get()
             ->map(function ($user) use ($request) {
                 if ($request->date) {
@@ -129,6 +131,7 @@ class AttendanceController extends Controller
             'week' => $request->week,
             'division' => $request->division,
             'jobTitle' => $request->jobTitle,
+            'branch' => $request->branch,
             'start' => $request->date ? null : $start,
             'end' => $request->date ? null : $end
         ])->setPaper($request->month ? 'a3' : 'a4', $request->date ? 'portrait' : 'landscape');

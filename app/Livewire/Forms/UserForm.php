@@ -3,6 +3,7 @@
 namespace App\Livewire\Forms;
 
 use Livewire\Form;
+use App\Models\LeaveQuota;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -27,8 +28,10 @@ class UserForm extends Form
     public $birth_date = null;
     public $birth_place = '';
     public $division_id = null;
+    public $branch_id = null;
     public $education_id = null;
     public $job_title_id = null;
+    public $leave_quota_days = 12;
     public $photo = null;
 
     public function rules()
@@ -57,8 +60,10 @@ class UserForm extends Form
             'birth_date' => ['nullable', 'date'],
             'birth_place' => ['nullable', 'string', 'max:255'],
             'division_id' => ['nullable', 'exists:divisions,id'],
+            'branch_id' => ['nullable', 'exists:branches,id'],
             'education_id' => ['nullable', 'exists:educations,id'],
             'job_title_id' => ['nullable', 'exists:job_titles,id'],
+            'leave_quota_days' => ['nullable', 'integer', 'min:0', 'max:365'],
             'photo' => ['nullable', 'mimes:jpg,jpeg,png', 'max:1024'],
         ];
     }
@@ -70,9 +75,6 @@ class UserForm extends Form
         $this->nip = $user->nip;
         $this->email = $user->email;
         $this->phone = $user->phone;
-        if ($this->isAllowed()) {
-            $this->password = $user->raw_password;
-        }
         $this->gender = $user->gender;
         $this->city = $user->city;
         $this->address = $user->address;
@@ -80,8 +82,12 @@ class UserForm extends Form
         $this->birth_date = $this->safeParseDate($user->birth_date)?->format('Y-m-d');
         $this->birth_place = $user->birth_place;
         $this->division_id = $user->division_id;
+        $this->branch_id = $user->branch_id;
         $this->education_id = $user->education_id;
         $this->job_title_id = $user->job_title_id;
+        $this->leave_quota_days = LeaveQuota::where('user_id', $user->id)
+            ->where('year', now()->year)
+            ->value('quota_days') ?? 12;
         return $this;
     }
 
@@ -95,9 +101,9 @@ class UserForm extends Form
         $user = User::create([
             ...$this->all(),
             'password' => Hash::make($this->password ?? 'password'),
-            'raw_password' => $this->password ?? 'password',
         ]);
         if (isset($this->photo)) $user->updateProfilePhoto($this->photo);
+        $this->syncLeaveQuota($user);
         $this->reset();
     }
 
@@ -110,9 +116,9 @@ class UserForm extends Form
         $this->user->update([
             ...$this->all(),
             'password' => $this->password ? Hash::make($this->password) : $this->user?->password,
-            'raw_password' => $this->password ?? $this->user?->raw_password,
         ]);
         if (isset($this->photo)) $this->user->updateProfilePhoto($this->photo);
+        $this->syncLeaveQuota($this->user);
         $this->reset();
     }
 
@@ -132,6 +138,18 @@ class UserForm extends Form
         $this->user->delete();
         $this->deleteProfilePhoto();
         $this->reset();
+    }
+
+    private function syncLeaveQuota(User $user): void
+    {
+        if ($user->group !== 'user') {
+            return;
+        }
+
+        LeaveQuota::updateOrCreate(
+            ['user_id' => $user->id, 'year' => now()->year],
+            ['quota_days' => max(0, (int) ($this->leave_quota_days ?? 12))]
+        );
     }
 
     private function isAllowed()
