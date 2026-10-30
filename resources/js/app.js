@@ -2,16 +2,19 @@ import './bootstrap';
 
 Alpine.store('darkMode', {
     on: localStorage.getItem('isDark') === 'true',
+    apply() {
+        document.documentElement.classList.toggle('dark', this.on);
+        document.documentElement.style.colorScheme = this.on ? 'dark' : 'light';
+    },
     init() {
-        this.on = localStorage.getItem('isDark') === 'true' ?? window.matchMedia('(prefers-color-scheme: dark)').matches;
-        if (this.on) document.documentElement.classList.add('dark');
+        const stored = localStorage.getItem('isDark');
+        this.on = stored !== null ? stored === 'true' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+        this.apply();
     },
     toggle() {
         this.on = !this.on;
         localStorage.setItem('isDark', this.on);
-        this.on ?
-            document.documentElement.classList.add('dark') :
-            document.documentElement.classList.remove('dark');
+        this.apply();
     }
 });
 

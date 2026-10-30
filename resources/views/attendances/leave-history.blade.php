@@ -35,7 +35,7 @@
                 <tbody>
                   <tr class="group">
                     <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">
-                      {{ $req->type === 'excused' ? 'Izin' : 'Sakit' }}
+                      {{ $req->type_label }}
                     </td>
                     <td class="px-4 py-3 text-sm text-gray-900 dark:text-white text-nowrap">
                       {{ $req->from_date->format('d/m/Y') }}
@@ -92,7 +92,7 @@
             <div class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
               <div>
                 <span class="font-medium text-gray-900 dark:text-white">Tipe:</span>
-                {{ $req->type === 'excused' ? 'Izin' : 'Sakit' }}
+                {{ $req->type_label }}
               </div>
               <div>
                 <span class="font-medium text-gray-900 dark:text-white">Tanggal:</span>

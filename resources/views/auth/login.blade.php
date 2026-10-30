@@ -17,9 +17,9 @@
       <input type="hidden" id="device_token" name="device_token" value="">
 
       <div>
-        <x-label for="email" value="{{ __('Email or Phone') }}" />
+        <x-label for="email" value="Email atau No. HP" />
         <x-input id="email" class="mt-1 block w-full" type="text" name="email" :value="old('email')" required
-          autofocus autocomplete="username" />
+          autofocus autocomplete="username" spellcheck="false" />
       </div>
 
       <div class="mt-4">
@@ -31,19 +31,19 @@
       <div class="mt-4 block">
         <label for="remember_me" class="flex items-center">
           <x-checkbox id="remember_me" name="remember" checked />
-          <span class="ms-2 text-sm text-gray-600 dark:text-gray-400">{{ __('Remember me') }}</span>
+          <span class="ms-2 text-sm text-gray-600 dark:text-gray-400">Ingat saya</span>
         </label>
       </div>
 
       <div class="mb-3 mt-4 flex items-center justify-end">
-        <a href="{{ route('register') }}">
-          <x-secondary-button class="ms-4" type="button">
-            {{ __('Register') }}
-          </x-secondary-button>
-        </a>
+        @if (Route::has('register'))
+          <a href="{{ route('register') }}" class="rounded-lg px-4 py-2 text-sm font-semibold text-gray-700 underline hover:text-primary dark:text-gray-300">
+            Daftar
+          </a>
+        @endif
 
         <x-button class="ms-4">
-          {{ __('Log in') }}
+          Masuk
         </x-button>
       </div>
     </form>
@@ -64,7 +64,7 @@
     @if (Route::has('password.request'))
       <a class="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:text-gray-400 dark:hover:text-gray-100 dark:focus:ring-offset-gray-800"
         href="{{ route('password.request') }}">
-        {{ __('Forgot your password?') }}
+        Lupa kata sandi?
       </a>
     @endif
   </x-authentication-card>

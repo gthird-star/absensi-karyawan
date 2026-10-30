@@ -48,7 +48,6 @@ class UserFactory extends Factory
             'city' => fake()->city(),
             'group' => 'user',
             'password' => static::$password ??= Hash::make('password'),
-            'raw_password' => 'password',
             'two_factor_secret' => null,
             'two_factor_recovery_codes' => null,
             'remember_token' => Str::random(10),

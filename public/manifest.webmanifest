@@ -1,0 +1,23 @@
+{
+  "name": "Soerabaja45 Presensi",
+  "short_name": "Presensi45",
+  "description": "Presensi karyawan Soerabaja45 Group",
+  "start_url": "/home",
+  "display": "standalone",
+  "background_color": "#F3F7FC",
+  "theme_color": "#3988F5",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

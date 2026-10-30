@@ -21,6 +21,9 @@
                     <option value="sick" {{ (old('status') ?? $attendance?->status) === 'sick' ? 'selected' : '' }}>
                       Sakit
                     </option>
+                    <option value="annual" {{ (old('status') ?? $attendance?->status) === 'annual' ? 'selected' : '' }}>
+                      Cuti Tahunan (sisa {{ $quotaRemaining }} hari)
+                    </option>
                   </x-select>
                   @error('status')
                     <x-input-error for="status" class="mt-2" message="{{ $message }}" />
@@ -45,6 +48,10 @@
                     @enderror
                   </div>
                 </div>
+
+                <p class="mt-2 text-xs text-[#64748B] dark:text-gray-400">
+                  Sisa cuti tahunan: {{ $quotaRemaining }} hari.
+                </p>
 
                 <div class="mt-4">
                   <x-label for="note" value="Keterangan" />

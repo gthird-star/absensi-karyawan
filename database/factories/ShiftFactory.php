@@ -21,6 +21,8 @@ class ShiftFactory extends Factory
             'name' => ['Shift 1', 'Shift 2'][$i],
             'start_time' => ['08:00', '19:00'][$i],
             'end_time' => ['17:00', '02:00'][$i],
+            'is_cross_midnight' => $i === 1,
+            'late_tolerance_minutes' => 0,
         ];
     }
 }

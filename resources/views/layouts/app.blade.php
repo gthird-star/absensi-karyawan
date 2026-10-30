@@ -6,10 +6,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="csrf-token" content="{{ csrf_token() }}">
 
-  <title>{{ $title ?? config('app.name', 'Soerabaja45 Group - Absensi Karyawan') }}</title>
+  <title>{{ $title ?? config('app.name', 'Absensi Karyawan') }}</title>
 
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="{{ asset('logo.png') }}">
+  <link rel="manifest" href="{{ asset('manifest.webmanifest') }}">
+  <meta name="theme-color" content="#3988F5">
 
   <!-- Fonts: Inter -->
   <link rel="preconnect" href="https://fonts.bunny.net">
@@ -199,13 +201,15 @@
     </header>
 
     <!-- Page Content Container -->
-    <main class="flex-1 p-4 sm:p-6 lg:p-8 max-w-[1600px] w-full mx-auto">
+    <main class="flex-1 p-4 sm:p-6 lg:p-8 max-w-[1600px] w-full mx-auto {{ ($isAdmin ?? false) ? '' : 'pb-24 lg:pb-8' }}">
       {{ $slot }}
     </main>
 
     <!-- Footer -->
     <x-sigsegv-core-dumped />
   </div>
+
+  @include('layouts.partials.mobile-bottom-nav')
 
   @stack('modals')
 
