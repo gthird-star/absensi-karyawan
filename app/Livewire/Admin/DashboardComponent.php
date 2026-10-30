@@ -36,7 +36,7 @@ class DashboardComponent extends Component
 
         $employees = User::where('group', 'user')
             ->when($this->branch, fn ($query) => $query->where('branch_id', $this->branch))
-            ->paginate(20)
+            ->paginate(10)
             ->through(function (User $user) use ($attendances) {
                 return $user->setAttribute(
                     'attendance',
