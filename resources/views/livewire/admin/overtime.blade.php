@@ -38,7 +38,7 @@
     </div>
   </div>
 
-  <div class="overflow-x-auto">
+  <div class="overflow-x-auto rounded-2xl border border-[#E6EDF5] bg-white shadow-card dark:border-gray-800 dark:bg-gray-800">
     <table class="w-full divide-y divide-gray-200 dark:divide-gray-700">
       <thead class="bg-gray-50 dark:bg-gray-900">
         <tr>

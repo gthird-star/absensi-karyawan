@@ -13,7 +13,7 @@
     </x-select>
   </div>
 
-  <div class="overflow-x-scroll">
+  <div class="overflow-x-auto rounded-2xl border border-[#E6EDF5] bg-white shadow-card dark:border-gray-800 dark:bg-gray-800">
     <table class="w-full divide-y divide-gray-200 dark:divide-gray-700">
       <thead class="bg-gray-50 dark:bg-gray-900">
         <tr>
@@ -25,8 +25,8 @@
           <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300">Aksi</th>
         </tr>
       </thead>
+      <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
       @forelse ($requests as $req)
-        <tbody>
           <tr wire:key="{{ $req->id }}" class="group">
             <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">
               {{ $req->user->name }}
@@ -47,15 +47,15 @@
             <td class="px-4 py-3 text-sm text-nowrap">
               @switch($req->status)
                 @case('pending')
-                  <span class="text-amber-600 dark:text-amber-400">Menunggu</span>
+                  <span class="rounded-full bg-amber-50 px-2.5 py-1 text-xs font-bold text-amber-700 dark:bg-amber-950/40 dark:text-amber-400">Menunggu</span>
                   @break
                 @case('approved')
-                  <span class="text-emerald-600 dark:text-emerald-400">Disetujui</span>
+                  <span class="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400">Disetujui</span>
                   @break
                 @case('rejected')
-                  <span class="text-red-600 dark:text-red-400">Ditolak</span>
+                  <span class="rounded-full bg-rose-50 px-2.5 py-1 text-xs font-bold text-rose-700 dark:bg-rose-950/40 dark:text-rose-400">Ditolak</span>
                   @if ($req->rejection_reason)
-                    <span class="block text-xs text-gray-500 dark:text-gray-400">{{ $req->rejection_reason }}</span>
+                    <span class="mt-1 block text-xs text-gray-500 dark:text-gray-400">{{ $req->rejection_reason }}</span>
                   @endif
                   @break
               @endswitch
@@ -96,16 +96,14 @@
               </td>
             </tr>
           @endif
-        </tbody>
       @empty
-        <tbody>
           <tr>
             <td colspan="6" class="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
               Tidak ada data.
             </td>
           </tr>
-        </tbody>
       @endforelse
+      </tbody>
     </table>
   </div>
 

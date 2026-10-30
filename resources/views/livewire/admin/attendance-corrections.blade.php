@@ -14,7 +14,7 @@
     </div>
   </div>
 
-  <div class="overflow-x-auto">
+  <div class="overflow-x-auto rounded-2xl border border-[#E6EDF5] bg-white p-4 shadow-card dark:border-gray-800 dark:bg-[#1E293B]">
     <table class="w-full text-left text-sm">
       <thead>
         <tr class="border-b border-[#E6EDF5] text-[11px] font-bold uppercase tracking-wider text-[#64748B] dark:border-gray-800 dark:text-gray-400">
