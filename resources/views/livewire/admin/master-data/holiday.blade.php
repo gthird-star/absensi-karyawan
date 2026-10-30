@@ -25,7 +25,7 @@
           <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">{{ $holiday->name }}</td>
           <td class="relative flex justify-end gap-2 px-6 py-4">
             <x-button wire:click="edit({{ $holiday->id }})">Edit</x-button>
-            <x-danger-button wire:click="confirmDeletion({{ $holiday->id }}, '{{ $holiday->name }}')">Delete</x-danger-button>
+            <x-danger-button wire:click="confirmDeletion({{ $holiday->id }}, '{{ $holiday->name }}')">Hapus</x-danger-button>
           </td>
         </tr>
       @empty
@@ -40,10 +40,10 @@
 
   <x-confirmation-modal wire:model="confirmingDeletion">
     <x-slot name="title">Hapus Hari Libur</x-slot>
-    <x-slot name="content">Apakah Anda yakin ingin menghapus <b>{{ $deleteName }}</b>?</x-slot>
+    <x-slot name="content">Apakah Anda yakin ingin menghapus <b>{{ $deleteName }}</b>? Tindakan ini tidak dapat dibatalkan.</x-slot>
     <x-slot name="footer">
       <x-secondary-button wire:click="$toggle('confirmingDeletion')" wire:loading.attr="disabled">Cancel</x-secondary-button>
-      <x-danger-button class="ml-2" wire:click="delete" wire:loading.attr="disabled">Confirm</x-danger-button>
+      <x-danger-button class="ml-2" wire:click="delete" wire:loading.attr="disabled">Ya, Hapus</x-danger-button>
     </x-slot>
   </x-confirmation-modal>
 

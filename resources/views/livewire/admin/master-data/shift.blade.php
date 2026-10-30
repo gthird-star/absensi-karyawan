@@ -1,12 +1,16 @@
 <div>
-  <div class="mb-4 flex-col items-center gap-5 sm:flex-row md:flex md:justify-between lg:mr-4">
-    <h3 class="mb-4 text-lg font-semibold leading-tight text-gray-800 dark:text-gray-200 md:mb-0">
-      Data Shift
-    </h3>
+  <div class="mb-4 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between lg:mr-4">
+    <div>
+      <h3 class="text-lg font-semibold leading-tight text-gray-800 dark:text-gray-200">
+        Data Shift
+      </h3>
+      <p class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">Jam kerja per shift; shift malam lintas tengah malam otomatis terdeteksi.</p>
+    </div>
     <x-button wire:click="showCreating">
       <x-heroicon-o-plus class="mr-2 h-4 w-4" /> Tambah Shift
     </x-button>
   </div>
+  <div class="mb-4 overflow-x-auto rounded-2xl border border-[#E6EDF5] bg-white shadow-card dark:border-gray-800 dark:bg-gray-800 lg:mr-4">
   <table class="w-full divide-y divide-gray-200 dark:divide-gray-700">
     <thead class="bg-gray-50 dark:bg-gray-900">
       <tr>
@@ -14,10 +18,10 @@
           Shift
         </th>
         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300">
-          {{ __('Time Start') }}
+          Jam Mulai
         </th>
         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300">
-          {{ __('Time End') }}
+          Jam Selesai
         </th>
         <th scope="col" class="relative px-6 py-3">
           <span class="sr-only">Actions</span>
@@ -25,7 +29,7 @@
       </tr>
     </thead>
     <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
-      @foreach ($shifts as $shift)
+      @forelse ($shifts as $shift)
         <tr>
           <td class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
             {{ $shift->name }}
@@ -41,13 +45,20 @@
               Edit
             </x-button>
             <x-danger-button wire:click="confirmDeletion({{ $shift->id }}, '{{ $shift->name }}')">
-              Delete
+              Hapus
             </x-danger-button>
           </td>
         </tr>
-      @endforeach
+      @empty
+        <tr>
+          <td colspan="4" class="px-6 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+            Belum ada shift. Klik "Tambah Shift" untuk membuat.
+          </td>
+        </tr>
+      @endforelse
     </tbody>
   </table>
+  </div>
 
   <x-confirmation-modal wire:model="confirmingDeletion">
     <x-slot name="title">
@@ -55,16 +66,16 @@
     </x-slot>
 
     <x-slot name="content">
-      Apakah Anda yakin ingin menghapus <b>{{ $deleteName }}</b>?
+      Apakah Anda yakin ingin menghapus <b>{{ $deleteName }}</b>? Tindakan ini tidak dapat dibatalkan.
     </x-slot>
 
     <x-slot name="footer">
       <x-secondary-button wire:click="$toggle('confirmingDeletion')" wire:loading.attr="disabled">
-        {{ __('Cancel') }}
+        Batal
       </x-secondary-button>
 
       <x-danger-button class="ml-2" wire:click="delete" wire:loading.attr="disabled">
-        {{ __('Confirm') }}
+        Ya, Hapus
       </x-danger-button>
     </x-slot>
   </x-confirmation-modal>
@@ -114,11 +125,11 @@
 
       <x-slot name="footer">
         <x-secondary-button wire:click="$toggle('creating')" wire:loading.attr="disabled">
-          {{ __('Cancel') }}
+          Batal
         </x-secondary-button>
 
         <x-button class="ml-2" wire:click="create" wire:loading.attr="disabled">
-          {{ __('Confirm') }}
+          Simpan
         </x-button>
       </x-slot>
     </form>
@@ -169,11 +180,11 @@
 
       <x-slot name="footer">
         <x-secondary-button wire:click="$toggle('editing')" wire:loading.attr="disabled">
-          {{ __('Cancel') }}
+          Batal
         </x-secondary-button>
 
         <x-button class="ml-2" wire:click="update" wire:loading.attr="disabled">
-          {{ __('Confirm') }}
+          Simpan
         </x-button>
       </x-slot>
     </form>

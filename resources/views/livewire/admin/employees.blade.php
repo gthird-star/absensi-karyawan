@@ -123,9 +123,7 @@
                 <x-button wire:click="edit('{{ $user->id }}')">
                   Edit
                 </x-button>
-                <x-danger-button wire:click="confirmDeletion('{{ $user->id }}', '{{ $user->name }}')">
-                  Delete
-                </x-danger-button>
+                <x-danger-button wire:click="confirmDeletion('{{ $user->id }}', '{{ $user->name }}')">Hapus</x-danger-button>
               </div>
             </td>
           </tr>
@@ -143,16 +141,16 @@
     </x-slot>
 
     <x-slot name="content">
-      Apakah Anda yakin ingin menghapus <b>{{ $deleteName }}</b>?
+      Apakah Anda yakin ingin menghapus <b>{{ $deleteName }}</b>? Tindakan ini tidak dapat dibatalkan.
     </x-slot>
 
     <x-slot name="footer">
       <x-secondary-button wire:click="$toggle('confirmingDeletion')" wire:loading.attr="disabled">
-        {{ __('Cancel') }}
+        Batal
       </x-secondary-button>
 
       <x-danger-button class="ml-2" wire:click="delete" wire:loading.attr="disabled">
-        {{ __('Confirm') }}
+        Ya, Hapus
       </x-danger-button>
     </x-slot>
   </x-confirmation-modal>
@@ -372,11 +370,11 @@
 
       <x-slot name="footer">
         <x-secondary-button wire:click="$toggle('creating')" wire:loading.attr="disabled">
-          {{ __('Cancel') }}
+          Batal
         </x-secondary-button>
 
         <x-button class="ml-2" wire:click="create" wire:loading.attr="disabled" wire:target="form.photo">
-          {{ __('Confirm') }}
+          Simpan
         </x-button>
       </x-slot>
     </form>
@@ -598,11 +596,11 @@
 
       <x-slot name="footer">
         <x-secondary-button wire:click="$toggle('editing')" wire:loading.attr="disabled">
-          {{ __('Cancel') }}
+          Batal
         </x-secondary-button>
 
         <x-button class="ml-2" wire:click="update" wire:loading.attr="disabled" wire:target="form.photo">
-          {{ __('Confirm') }}
+          Simpan
         </x-button>
       </x-slot>
     </form>

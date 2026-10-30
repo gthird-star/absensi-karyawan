@@ -18,9 +18,7 @@
           <x-button href="{{ route('admin.barcodes.edit', $barcode->id) }}">
             Edit
           </x-button>
-          <x-danger-button wire:click="confirmDeletion({{ $barcode->id }}, '{{ $barcode->name }}')">
-            Delete
-          </x-danger-button>
+          <x-danger-button wire:click="confirmDeletion({{ $barcode->id }}, '{{ $barcode->name }}')">Hapus</x-danger-button>
         </div>
         <div class="container flex items-center justify-center p-4">
           <div id="qrcode{{ $barcode->id }}" class="h-64 w-64 bg-transparent">
@@ -48,16 +46,16 @@
     </x-slot>
 
     <x-slot name="content">
-      Apakah Anda yakin ingin menghapus <b>{{ $deleteName }}</b>?
+      Apakah Anda yakin ingin menghapus <b>{{ $deleteName }}</b>? Tindakan ini tidak dapat dibatalkan.
     </x-slot>
 
     <x-slot name="footer">
       <x-secondary-button wire:click="$toggle('confirmingDeletion')" wire:loading.attr="disabled">
-        {{ __('Cancel') }}
+        Batal
       </x-secondary-button>
 
       <x-danger-button class="ml-2" wire:click="delete" wire:loading.attr="disabled">
-        {{ __('Confirm') }}
+        Ya, Hapus
       </x-danger-button>
     </x-slot>
   </x-confirmation-modal>
