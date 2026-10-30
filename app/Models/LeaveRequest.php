@@ -38,6 +38,15 @@ class LeaveRequest extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function getTypeLabelAttribute(): string
+    {
+        return match ($this->type) {
+            'annual' => 'Cuti Tahunan',
+            'sick' => 'Sakit',
+            default => 'Izin',
+        };
+    }
+
     public function reviewer(): BelongsTo
     {
         return $this->belongsTo(User::class, 'reviewed_by');

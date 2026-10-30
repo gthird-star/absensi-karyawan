@@ -30,6 +30,11 @@ class Attendance extends Model
         'status',
         'note',
         'attachment',
+        'overtime_minutes',
+        'early_leave_minutes',
+        'corrected_by',
+        'corrected_at',
+        'correction_note',
     ];
 
     protected function casts(): array
@@ -38,6 +43,9 @@ class Attendance extends Model
             'date' => 'datetime:Y-m-d',
             'time_in' => 'datetime:H:i:s',
             'time_out' => 'datetime:H:i:s',
+            'corrected_at' => 'datetime',
+            'overtime_minutes' => 'integer',
+            'early_leave_minutes' => 'integer',
         ];
     }
 
@@ -54,6 +62,16 @@ class Attendance extends Model
     public function shift()
     {
         return $this->belongsTo(Shift::class);
+    }
+
+    public function corrector()
+    {
+        return $this->belongsTo(User::class, 'corrected_by');
+    }
+
+    public function editLogs()
+    {
+        return $this->hasMany(AttendanceEditLog::class);
     }
 
     function getLatLngAttribute(): array|null

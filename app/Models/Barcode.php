@@ -12,12 +12,18 @@ class Barcode extends Model
     use HasTimestamps;
 
     protected $fillable = [
+        'branch_id',
         'name',
         'value',
         'latitude',
         'longitude',
         'radius',
     ];
+
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
+    }
 
     function getLatLngAttribute(): array|null
     {

@@ -31,8 +31,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'raw_password',
         'group',
+        'branch_id',
         'phone',
         'gender',
         'birth_date',
@@ -53,7 +53,6 @@ class User extends Authenticatable
      */
     protected $hidden = [
         'password',
-        'raw_password',
         'remember_token',
         'two_factor_recovery_codes',
         'two_factor_secret',
@@ -102,6 +101,16 @@ class User extends Authenticatable
     final public function getIsNotAdminAttribute(): bool
     {
         return !$this->isAdmin;
+    }
+
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
+    }
+
+    public function leaveQuotas()
+    {
+        return $this->hasMany(LeaveQuota::class);
     }
 
     public function education()

@@ -14,5 +14,15 @@ class Shift extends Model
         'name',
         'start_time',
         'end_time',
+        'is_cross_midnight',
+        'late_tolerance_minutes',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'is_cross_midnight' => 'boolean',
+            'late_tolerance_minutes' => 'integer',
+        ];
+    }
 }
