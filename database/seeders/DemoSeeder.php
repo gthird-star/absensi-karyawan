@@ -141,6 +141,7 @@ class DemoSeeder extends Seeder
                 'division_id' => $divisions->random(),
                 'education_id' => $educations->random(),
                 'job_title_id' => $jobTitles->random(),
+                'profile_photo_path' => 'https://picsum.photos/400/400?random='.($index + 1),
             ]);
 
             LeaveQuota::updateOrCreate(

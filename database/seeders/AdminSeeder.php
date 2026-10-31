@@ -17,6 +17,7 @@ class AdminSeeder extends Seeder
             'name' => 'Super Admin',
             'email' => 'superadmin@example.com',
             'password' => Hash::make('superadmin'),
+            'profile_photo_path' => 'https://picsum.photos/400/400?random=1001',
         ])->getAttributes();
 
         User::firstOrCreate(['email' => 'superadmin@example.com'], $superadmin);
@@ -25,6 +26,7 @@ class AdminSeeder extends Seeder
             'name' => 'Admin',
             'email' => 'admin@example.com',
             'password' => Hash::make('admin'),
+            'profile_photo_path' => 'https://picsum.photos/400/400?random=1002',
         ])->getAttributes();
 
         User::firstOrCreate(['email' => 'admin@example.com'], $admin);
