@@ -157,7 +157,7 @@
 
       <div class="my-6 h-40 w-full sm:h-52 md:h-64" id="map" wire:ignore></div>
 
-      <div class="mb-4 flex items-center justify-between rounded-2xl border border-[#E6EDF5] bg-[#F8FAFD] px-4 py-3 dark:border-gray-700 dark:bg-gray-800">
+      <div class="mb-4 mt-6 flex items-center justify-between rounded-2xl border border-[#E6EDF5] bg-[#F8FAFD] px-4 py-3 dark:border-gray-700 dark:bg-gray-800">
          <div>
            <p class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Sisa Cuti Tahunan</p>
            <p class="text-lg font-bold text-[#14264A] dark:text-white">{{ $quotaRemaining ?? 0 }} hari</p>
