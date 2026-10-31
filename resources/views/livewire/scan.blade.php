@@ -65,16 +65,16 @@
         <p class="text-center text-sm text-gray-500 dark:text-gray-400">
           Arahkan kamera ke QR code di lokasi absen.
         </p>
-        <div class="grid grid-cols-2 gap-2 text-xs">
-          <div class="rounded-xl border border-[#E6EDF5] bg-[#F8FAFD] px-3 py-2 dark:border-gray-700 dark:bg-gray-800">
-            <span class="block font-semibold text-gray-500 dark:text-gray-400">Akurasi GPS</span>
-            <span id="gps-accuracy" class="font-bold text-[#14264A] dark:text-white">Menunggu…</span>
-          </div>
-          <div class="rounded-xl border border-[#E6EDF5] bg-[#F8FAFD] px-3 py-2 dark:border-gray-700 dark:bg-gray-800">
-            <span class="block font-semibold text-gray-500 dark:text-gray-400">Jarak ke QR</span>
-            <span id="qr-distance" class="font-bold text-[#14264A] dark:text-white">Menunggu…</span>
-          </div>
-        </div>
+        <div class="grid grid-cols-2 gap-3 text-xs">
+           <div class="rounded-xl border border-[#E6EDF5] bg-[#F8FAFD] px-3 py-2 dark:border-gray-700 dark:bg-gray-800">
+             <span class="block font-semibold text-gray-500 dark:text-gray-400">Akurasi GPS</span>
+             <span id="gps-accuracy" class="font-bold text-[#14264A] dark:text-white">Menunggu…</span>
+           </div>
+           <div class="rounded-xl border border-[#E6EDF5] bg-[#F8FAFD] px-3 py-2 dark:border-gray-700 dark:bg-gray-800">
+             <span class="block font-semibold text-gray-500 dark:text-gray-400">Jarak ke QR</span>
+             <span id="qr-distance" class="font-bold text-[#14264A] dark:text-white">Menunggu…</span>
+           </div>
+         </div>
       </div>
     @endif
     <div class="w-full">
@@ -102,74 +102,74 @@
         @else
           {{ __('Your location') . ': -, -' }}
         @endif
-        <div class="my-6 h-72 w-full md:h-96" id="currentMap" wire:ignore></div>
+      <div class="my-6 h-40 w-full sm:h-52 md:h-96" id="currentMap" wire:ignore></div>
       </h4>
-      <div class="grid grid-cols-2 gap-3 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
-        <div
-          class="{{ $attendance?->status == 'late' ? 'bg-red-200 dark:bg-red-900' : 'bg-blue-200 dark:bg-blue-900' }} flex items-center justify-between rounded-md px-4 py-2 text-gray-800 dark:text-white dark:shadow-gray-700">
-          <div>
-            <h4 class="text-lg font-semibold md:text-xl">Absen Masuk</h4>
-            <div class="flex flex-col sm:flex-row">
-              <span>
-                @if ($isAbsence)
-                  {{ $attendance ? __("status_" . $attendance->status) : '-' }}
-                @else
-                  {{ $attendance?->time_in ? Carbon::parse($attendance?->time_in)->format('H:i:s') : 'Belum Absen' }}
-                @endif
-              </span>
-              @if ($attendance?->status == 'late')
-                <span class="mx-1 hidden sm:inline-block">|</span>
-              @endif
-              <span>{{ $attendance?->status == 'late' ? 'Terlambat: Ya' : '' }}</span>
-            </div>
-          </div>
-          <x-heroicon-o-arrows-pointing-in class="h-5 w-5" />
-        </div>
-        <div
-          class="flex items-center justify-between rounded-md bg-orange-200 px-4 py-2 text-gray-800 dark:bg-orange-900 dark:text-white dark:shadow-gray-700">
-          <div>
-            <h4 class="text-lg font-semibold md:text-xl">Absen Keluar</h4>
-            @if ($isAbsence)
-              {{ $attendance ? __("status_" . $attendance->status) : '-' }}
-            @else
-              {{ $attendance?->time_out ? Carbon::parse($attendance?->time_out)->format('H:i:s') : 'Belum Absen' }}
-            @endif
-          </div>
-          <x-heroicon-o-arrows-pointing-out class="h-5 w-5" />
-        </div>
-        <button
-          class="col-span-2 flex items-center justify-between rounded-md bg-purple-200 px-4 py-2 text-gray-800 dark:bg-purple-900 dark:text-white dark:shadow-gray-700 md:col-span-1 lg:col-span-2 xl:col-span-1"
-          {{ is_null($attendance?->lat_lng) ? 'disabled' : 'onclick=toggleMap()' }} id="toggleMap">
-          <div>
-            <h4 class="text-lg font-semibold md:text-xl">Koordinat Absen</h4>
-            @if (is_null($attendance?->lat_lng))
-              Belum Absen
-            @else
-              <a href="{{ \App\Helpers::getGoogleMapsUrl($attendance?->latitude, $attendance?->longitude) }}"
-                target="_blank" class="underline hover:text-blue-400">
-                {{ $attendance?->latitude . ', ' . $attendance?->longitude }}
-              </a>
-            @endif
-          </div>
-          <x-heroicon-o-map-pin class="h-6 w-6" />
-        </button>
-      </div>
+      <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+         <div
+           class="{{ $attendance?->status == 'late' ? 'bg-red-200 dark:bg-red-900' : 'bg-blue-200 dark:bg-blue-900' }} flex items-center justify-between rounded-md px-4 py-2 text-gray-800 dark:text-white dark:shadow-gray-700">
+           <div>
+             <h4 class="text-lg font-semibold md:text-xl">Absen Masuk</h4>
+             <div class="flex flex-col sm:flex-row">
+               <span>
+                 @if ($isAbsence)
+                   {{ $attendance ? __("status_" . $attendance->status) : '-' }}
+                 @else
+                   {{ $attendance?->time_in ? Carbon::parse($attendance?->time_in)->format('H:i:s') : 'Belum Absen' }}
+                 @endif
+               </span>
+               @if ($attendance?->status == 'late')
+                 <span class="mx-1 hidden sm:inline-block">|</span>
+               @endif
+               <span>{{ $attendance?->status == 'late' ? 'Terlambat: Ya' : '' }}</span>
+             </div>
+           </div>
+           <x-heroicon-o-arrows-pointing-in class="h-5 w-5" />
+         </div>
+         <div
+           class="flex items-center justify-between rounded-md bg-orange-200 px-4 py-2 text-gray-800 dark:bg-orange-900 dark:text-white dark:shadow-gray-700">
+           <div>
+             <h4 class="text-lg font-semibold md:text-xl">Absen Keluar</h4>
+             @if ($isAbsence)
+               {{ $attendance ? __("status_" . $attendance->status) : '-' }}
+             @else
+               {{ $attendance?->time_out ? Carbon::parse($attendance?->time_out)->format('H:i:s') : 'Belum Absen' }}
+             @endif
+           </div>
+           <x-heroicon-o-arrows-pointing-out class="h-5 w-5" />
+         </div>
+         <button
+           class="flex items-center justify-between rounded-md bg-purple-200 px-4 py-2 text-gray-800 dark:bg-purple-900 dark:text-white dark:shadow-gray-700 sm:col-span-2 lg:col-span-1"
+           {{ is_null($attendance?->lat_lng) ? 'disabled' : 'onclick=toggleMap()' }} id="toggleMap">
+           <div>
+             <h4 class="text-lg font-semibold md:text-xl">Koordinat Absen</h4>
+             @if (is_null($attendance?->lat_lng))
+               Belum Absen
+             @else
+               <a href="{{ \App\Helpers::getGoogleMapsUrl($attendance?->latitude, $attendance?->longitude) }}"
+                 target="_blank" class="underline hover:text-blue-400">
+                 {{ $attendance?->latitude . ', ' . $attendance?->longitude }}
+               </a>
+             @endif
+           </div>
+           <x-heroicon-o-map-pin class="h-6 w-6" />
+         </button>
+       </div>
 
-      <div class="my-6 h-52 w-full md:h-64" id="map" wire:ignore></div>
+      <div class="my-6 h-40 w-full sm:h-52 md:h-64" id="map" wire:ignore></div>
 
       <div class="mb-4 flex items-center justify-between rounded-2xl border border-[#E6EDF5] bg-[#F8FAFD] px-4 py-3 dark:border-gray-700 dark:bg-gray-800">
-        <div>
-          <p class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Sisa Cuti Tahunan</p>
-          <p class="text-lg font-bold text-[#14264A] dark:text-white">{{ $quotaRemaining ?? 0 }} hari</p>
-        </div>
-        <a href="{{ route('apply-leave') }}" class="text-xs font-semibold text-primary hover:underline dark:text-blue-400">
-          Ajukan cuti
-        </a>
-      </div>
+         <div>
+           <p class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Sisa Cuti Tahunan</p>
+           <p class="text-lg font-bold text-[#14264A] dark:text-white">{{ $quotaRemaining ?? 0 }} hari</p>
+         </div>
+         <a href="{{ route('apply-leave') }}" class="text-xs font-semibold text-primary hover:underline dark:text-blue-400">
+           Ajukan cuti
+         </a>
+       </div>
 
-      <hr class="my-4">
+       <hr class="my-4">
 
-      <div class="grid grid-cols-2 gap-3 md:grid-cols-2 lg:grid-cols-3" wire:ignore>
+       <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3" wire:ignore>
         <a href="{{ route('apply-leave') }}">
           <div
             class="flex flex-col-reverse items-center justify-center gap-2 rounded-md bg-amber-500 px-4 py-2 text-center font-medium text-white shadow-md shadow-gray-400 transition duration-100 hover:bg-amber-600 dark:shadow-gray-700 md:flex-row md:gap-3">

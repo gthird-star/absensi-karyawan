@@ -1,6 +1,5 @@
 <x-app-layout>
-  <div x-data="{ open: false, selectedId: null, selectedData: {} }"
-    @detail-leave.window="selectedId = $event.detail; open = true"
+  <div
     class="bg-white dark:bg-[#1E293B] shadow-card border border-[#E6EDF5] dark:border-gray-800 rounded-2xl p-6 sm:p-8">
           <div class="mb-4 flex items-center gap-3">
             <x-label for="filter" value="Filter Status"></x-label>
@@ -20,9 +19,9 @@
               </x-button>
             </a>
           </div>
-          <div class="overflow-x-scroll">
+          <div class="mb-4 overflow-x-auto rounded-2xl border border-[#E6EDF5] dark:border-gray-700">
             <table class="w-full divide-y divide-gray-200 dark:divide-gray-700">
-              <thead class="bg-gray-50 dark:bg-gray-900">
+              <thead class="rounded-t-2xl bg-gray-50 dark:bg-gray-900">
                 <tr>
                   <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300">Tipe</th>
                   <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300">Tanggal</th>
@@ -31,8 +30,8 @@
                   <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300">Detail</th>
                 </tr>
               </thead>
+              <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
               @forelse ($leaveRequests as $req)
-                <tbody>
                   <tr class="group">
                     <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">
                       {{ $req->type_label }}
@@ -49,13 +48,13 @@
                     <td class="px-4 py-3 text-sm">
                       @switch($req->status)
                         @case('pending')
-                          <span class="font-medium text-amber-600 dark:text-amber-400">Menunggu</span>
+                          <span class="rounded-full bg-amber-50 px-2.5 py-1 text-xs font-bold text-amber-700 dark:bg-amber-950/40 dark:text-amber-400">Menunggu</span>
                           @break
                         @case('approved')
-                          <span class="font-medium text-emerald-600 dark:text-emerald-400">Disetujui</span>
+                          <span class="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400">Disetujui</span>
                           @break
                         @case('rejected')
-                          <span class="font-medium text-red-600 dark:text-red-400">Ditolak</span>
+                          <span class="rounded-full bg-rose-50 px-2.5 py-1 text-xs font-bold text-rose-700 dark:bg-rose-950/40 dark:text-rose-400">Ditolak</span>
                           @break
                       @endswitch
                     </td>
@@ -63,16 +62,14 @@
                       <x-button @click="$dispatch('detail-leave', {{ $req->id }})">Lihat</x-button>
                     </td>
                   </tr>
-                </tbody>
               @empty
-                <tbody>
                   <tr>
                     <td colspan="5" class="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
                       Belum ada pengajuan izin.
                     </td>
                   </tr>
-                </tbody>
               @endforelse
+              </tbody>
             </table>
           </div>
           <div class="mt-4">
@@ -80,16 +77,29 @@
           </div>
         </div>
 
-    <div x-show="open"
-      class="fixed inset-0 z-50 flex items-center justify-center"
+    <div x-data="{ open: false, selectedId: null }"
+      x-cloak
+      x-show="open"
+      @detail-leave.window="selectedId = $event.detail; open = true"
+      role="dialog" aria-modal="true" aria-labelledby="leave-detail-title"
+      class="fixed inset-0 z-50 overflow-y-auto overscroll-contain px-4 py-6"
       @keydown.escape.window="open = false">
-      <div class="fixed inset-0 bg-gray-900/50" @click="open = false"></div>
-      <div class="relative z-50 w-full max-w-md rounded-lg bg-white p-6 shadow-xl dark:bg-gray-800">
-        <h3 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Detail Pengajuan</h3>
+      <div x-show="open" class="fixed inset-0 bg-gray-900/50" @click="open = false"></div>
 
-        @foreach ($leaveRequests as $req)
-          <div x-show="selectedId === {{ $req->id }}">
-            <div class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
+      <div x-show="open"
+        class="relative mx-auto my-6 w-full max-w-md rounded-2xl bg-white shadow-xl dark:bg-gray-800">
+        <div class="flex items-center justify-between border-b border-[#E6EDF5] px-6 py-4 dark:border-gray-700">
+          <h3 id="leave-detail-title" class="text-lg font-semibold text-gray-900 dark:text-white">Detail Pengajuan</h3>
+          <button @click="open = false" aria-label="Tutup detail pengajuan"
+            class="rounded-lg p-1.5 text-gray-400 transition hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-200">
+            <x-heroicon-o-x-mark class="h-5 w-5" />
+          </button>
+        </div>
+
+        <div class="max-h-[70vh] overflow-y-auto overscroll-contain px-6 py-4">
+          @foreach ($leaveRequests as $req)
+            <div x-show="selectedId === {{ $req->id }}" x-cloak>
+              <div class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
               <div>
                 <span class="font-medium text-gray-900 dark:text-white">Tipe:</span>
                 {{ $req->type_label }}
