@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -82,6 +83,25 @@ class User extends Authenticatable
     }
 
     public static $groups = ['user', 'admin', 'superadmin'];
+
+    /**
+     * Get the URL to the user's profile photo (override Jetstream to support external URLs).
+     */
+    protected function profilePhotoUrl(): Attribute
+    {
+        return Attribute::get(function (): string {
+            if ($this->profile_photo_path) {
+                // If URL is external (http/https), return as-is
+                if (str_starts_with($this->profile_photo_path, 'http')) {
+                    return $this->profile_photo_path;
+                }
+                // Otherwise use Storage disk (local file)
+                return \Illuminate\Support\Facades\Storage::disk($this->profilePhotoDisk())->url($this->profile_photo_path);
+            }
+            // Fallback to default avatar
+            return $this->defaultProfilePhotoUrl();
+        });
+    }
 
     final public function getIsUserAttribute(): bool
     {
