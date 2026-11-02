@@ -1,23 +1,16 @@
-# Aplikasi Web Absensi Karyawan QR Code GPS
+# Aplikasi Web Absensi Karyawan — Soerabaja45 Group
 
-<a href="https://trendshift.io/repositories/135323?utm_source=trendshift-badge&amp;utm_medium=badge&amp;utm_campaign=badge-trendshift-135323" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/trendshift/repositories/135323/daily?language=Blade" alt="ikhsan3adi%2Fabsensi-karyawan-gps-barcode | Trendshift" width="250" height="55"/></a>
-<a href="https://trendshift.io/repositories/135323?utm_source=trendshift-badge&amp;utm_medium=badge&amp;utm_campaign=badge-trendshift-135323" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/trendshift/repositories/135323/weekly?language=Blade" alt="ikhsan3adi%2Fabsensi-karyawan-gps-barcode | Trendshift" width="250" height="55"/></a>
-<a href="https://trendshift.io/repositories/135323?utm_source=trendshift-badge&amp;utm_medium=badge&amp;utm_campaign=badge-trendshift-135323" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/trendshift/repositories/135323/monthly?language=Blade" alt="ikhsan3adi%2Fabsensi-karyawan-gps-barcode | Trendshift" width="250" height="55"/></a>
-
-<a href="https://github.com/ikhsan3adi/absensi-karyawan-gps-barcode/actions/workflows/laravel.yml">
-    <img src="https://img.shields.io/github/actions/workflow/status/ikhsan3adi/absensi-karyawan-gps-barcode/laravel.yml?branch=master&style=for-the-badge&label=Continuous%20Integration&labelColor=%23934eb6&logo=github" alt="Continuous Integration">
+<a href="https://github.com/gthird-star/absensi-karyawan">
+    <img src="https://img.shields.io/github/stars/gthird-star/absensi-karyawan?style=for-the-badge&labelColor=%234f46e5&color=%237c3aed&logo=github" alt="GitHub Repo stars">
 </a>
-<a href="https://github.com/ikhsan3adi/absensi-karyawan-gps-barcode/stargazers">
-    <img src="https://img.shields.io/github/stars/ikhsan3adi/absensi-karyawan-gps-barcode?style=for-the-badge&labelColor=%23934eb6&color=%23ec73a9&logo=github" alt="GitHub Repo stars">
+<a href="https://github.com/gthird-star/absensi-karyawan/graphs/contributors">
+    <img src="https://img.shields.io/github/contributors-anon/gthird-star/absensi-karyawan?style=for-the-badge&labelColor=%234f46e5&color=%237c3aed&logo=github" alt="GitHub Contributors">
 </a>
-<a href="https://github.com/ikhsan3adi/absensi-karyawan-gps-barcode/graphs/contributors">
-    <img src="https://img.shields.io/github/contributors-anon/ikhsan3adi/absensi-karyawan-gps-barcode?style=for-the-badge&labelColor=%23934eb6&color=%23ec73a9&logo=github" alt="GitHub Contributors">
+<a href="https://github.com/gthird-star/absensi-karyawan/network/members">
+    <img src="https://img.shields.io/github/forks/gthird-star/absensi-karyawan?style=for-the-badge&labelColor=%234f46e5&color=%237c3aed&logo=github" alt="GitHub forks">
 </a>
-<a href="https://github.com/ikhsan3adi/absensi-karyawan-gps-barcode/network/members">
-    <img src="https://img.shields.io/github/forks/ikhsan3adi/absensi-karyawan-gps-barcode?style=for-the-badge&labelColor=%23934eb6&color=%23ec73a9&logo=github" alt="GitHub forks">
-</a>
-<a href="https://github.com/ikhsan3adi/absensi-karyawan-gps-barcode/watchers">
-    <img src="https://img.shields.io/github/watchers/ikhsan3adi/absensi-karyawan-gps-barcode?style=for-the-badge&labelColor=%23934eb6&color=%23ec73a9&logo=github" alt="GitHub watchers">
+<a href="https://github.com/gthird-star/absensi-karyawan/watchers">
+    <img src="https://img.shields.io/github/watchers/gthird-star/absensi-karyawan?style=for-the-badge&labelColor=%234f46e5&color=%237c3aed&logo=github" alt="GitHub watchers">
 </a>
 <a href="#teknologi-yang-digunakan">
     <img src="https://img.shields.io/badge/12-%23FFF.svg?style=for-the-badge&label=Laravel&labelColor=%23934eb6&color=%23ec73a9&logo=laravel&logoColor=%23FFF" alt="Laravel">
@@ -29,7 +22,7 @@
 | ![Aplikasi Web Absensi Karyawan QR Code GPS](./screenshots/absensi-gps-barcode-social-preview.png) |
 | -------------------------------------------------------------------------------------------------- |
 
-Aplikasi web absensi karyawan menggunakan QR Code dan GPS.
+Aplikasi web absensi karyawan berbasis Laravel dengan QR Code, GPS, dan dashboard modern untuk operasional Soerabaja45 Group.
 
 ## Teknologi yang Digunakan
 
@@ -403,7 +396,6 @@ Pengajuan izin tidak langsung disetujui, melainkan melalui proses approval:
 
 ## Donasi ❤
 
-[![Donate trakteer](https://img.shields.io/badge/Donate-Trakteer-red?style=for-the-badge&link=https%3A%2F%2Ftrakteer.id%2Fikhsan3adi%2Ftip)](https://trakteer.id/ikhsan3adi/tip)
 [![Donate saweria](https://img.shields.io/badge/Donate-Saweria-red?style=for-the-badge&link=https%3A%2F%2Fsaweria.co%2Fxiboxann)](https://saweria.co/xiboxann)
 
 Atau, beri star...⭐⭐⭐⭐
